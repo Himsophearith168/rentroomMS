@@ -1,5 +1,6 @@
 <template>
   <div class="bills-view">
+    <!-- ... header remains same ... -->
     <div class="header-section d-flex justify-content-between align-items-center mb-4">
       <div>
         <h1 class="display-6 fw-bold">វិក្កយបត្រ (Bills)</h1>
@@ -10,30 +11,14 @@
       </BaseButton>
     </div>
 
-    <div class="row g-4 mb-4">
-      <div class="col-12 col-md-4">
-        <StateCard label="វិក្កយបត្រមិនទាន់បង់" value="5" variant="red">
-          <template #icon><i class="bi bi-clock-history fs-4"></i></template>
-        </StateCard>
-      </div>
-      <div class="col-12 col-md-4">
-        <StateCard label="វិក្កយបត្រខែនេះ" value="12" variant="blue">
-          <template #icon><i class="bi bi-calendar-event fs-4"></i></template>
-        </StateCard>
-      </div>
-      <div class="col-12 col-md-4">
-        <StateCard label="ទឹកប្រាក់សរុប" value="$850" variant="purple">
-          <template #icon><i class="bi bi-cash-stack fs-4"></i></template>
-        </StateCard>
-      </div>
-    </div>
+    <!-- ... cards ... -->
 
     <div class="card border-0 rounded-4 shadow-sm">
       <div class="card-body p-0">
         <BaseTable 
-          :items="mockBills" 
+          :items="rentStore.invoices" 
           :fields="tableFields"
-          :totalRows="mockBills.length"
+          :totalRows="rentStore.invoices.length"
           :perPage="10"
           :currentPage="1"
         >
@@ -58,10 +43,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { onMounted } from 'vue';
+import { useRentStore } from '@/stores/rentroom';
 import StateCard from '@/components/ui/StateCard.vue';
 import BaseTable from '@/components/ui/BaseTable.vue';
 import BaseButton from '@/components/ui/BaseButton.vue';
+
+const rentStore = useRentStore();
 
 const tableFields = [
   { key: 'invoiceId', label: 'លេខវិក្កយបត្រ', thClass: 'ps-4', tdClass: 'ps-4' },
@@ -73,12 +61,9 @@ const tableFields = [
   { key: 'actions', label: 'សកម្មភាព' }
 ];
 
-const mockBills = ref([
-  { invoiceId: 'INV-202405-01', tenant: 'សុខ សាន', room: 'R-002', month: 'ឧសភា 2024', amount: 120, status: 'រួចរាល់' },
-  { invoiceId: 'INV-202405-02', tenant: 'កែវ សុភា', room: 'R-004', month: 'ឧសភា 2024', amount: 65, status: 'មិនទាន់បង់' },
-  { invoiceId: 'INV-202405-03', tenant: 'ចាន់ ថន', room: 'R-006', month: 'ឧសភា 2024', amount: 70, status: 'រួចរាល់' },
-  { invoiceId: 'INV-202405-04', tenant: 'លី ហួរ', room: 'R-008', month: 'ឧសភា 2024', amount: 145, status: 'មិនទាន់បង់' },
-]);
+onMounted(() => {
+  rentStore.fetchInvoices();
+});
 </script>
 
 <style scoped>

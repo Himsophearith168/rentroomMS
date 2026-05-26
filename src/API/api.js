@@ -4,9 +4,7 @@ import { useAuthStore } from "@/stores/authentication";
 const api = axios.create({
   baseURL:
     import.meta.env.VITE_BASE_URL ||
-    "",
-
-  baseURL: "https://ant-g6-todolist.ti.linkpc.net/api/v1",
+    "http://localhost:3000/api/v1",
 
   headers: {
     Accept: "application/json",

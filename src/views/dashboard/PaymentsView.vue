@@ -1,5 +1,6 @@
 <template>
   <div class="payments-view">
+    <!-- ... header remains same ... -->
     <div class="header-section d-flex justify-content-between align-items-center mb-4">
       <div>
         <h1 class="display-6 fw-bold">ការទូទាត់ (Payments)</h1>
@@ -15,30 +16,14 @@
       </div>
     </div>
 
-    <div class="row g-4 mb-4">
-      <div class="col-12 col-md-4">
-        <StateCard label="ចំណូលសរុបខែនេះ" value="$1,540" variant="green">
-          <template #icon><i class="bi bi-graph-up fs-4"></i></template>
-        </StateCard>
-      </div>
-      <div class="col-12 col-md-4">
-        <StateCard label="ប្រតិបត្តិការសរុប" value="45" variant="blue">
-          <template #icon><i class="bi bi-arrow-left-right fs-4"></i></template>
-        </StateCard>
-      </div>
-      <div class="col-12 col-md-4">
-        <StateCard label="មធ្យមភាគក្នុងម្នាក់" value="$85" variant="yellow">
-          <template #icon><i class="bi bi-person-badge fs-4"></i></template>
-        </StateCard>
-      </div>
-    </div>
+    <!-- ... cards ... -->
 
     <div class="card border-0 rounded-4 shadow-sm">
       <div class="card-body p-0">
         <BaseTable 
-          :items="mockPayments" 
+          :items="rentStore.payments" 
           :fields="tableFields"
-          :totalRows="mockPayments.length"
+          :totalRows="rentStore.payments.length"
           :perPage="10"
           :currentPage="1"
         >
@@ -59,10 +44,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { onMounted } from 'vue';
+import { useRentStore } from '@/stores/rentroom';
 import StateCard from '@/components/ui/StateCard.vue';
 import BaseTable from '@/components/ui/BaseTable.vue';
 import BaseButton from '@/components/ui/BaseButton.vue';
+
+const rentStore = useRentStore();
 
 const tableFields = [
   { key: 'date', label: 'ថ្ងៃខែឆ្នាំ', thClass: 'ps-4', tdClass: 'ps-4' },
@@ -73,12 +61,9 @@ const tableFields = [
   { key: 'ref', label: 'លេខយោង' }
 ];
 
-const mockPayments = ref([
-  { date: '2024-05-15', tenant: 'សុខ សាន', room: 'R-002', amount: 120, method: 'ABA', ref: 'TXN-99821' },
-  { date: '2024-05-14', tenant: 'ចាន់ ថន', room: 'R-006', amount: 70, method: 'សាច់ប្រាក់', ref: '-' },
-  { date: '2024-05-12', tenant: 'លី ហួរ', room: 'R-008', amount: 145, method: 'ABA', ref: 'TXN-99750' },
-  { date: '2024-05-10', tenant: 'មាស ស្រីនាថ', room: 'R-010', amount: 90, method: 'ABA', ref: 'TXN-99701' },
-]);
+onMounted(() => {
+  rentStore.fetchPayments();
+});
 </script>
 
 <style scoped>

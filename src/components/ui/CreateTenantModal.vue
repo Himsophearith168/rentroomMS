@@ -12,38 +12,36 @@
             <div class="row g-4">
               <div class="col-12">
                 <BaseInput 
-                  label="លេខបន្ទប់" 
-                  v-model="formData.roomNumber" 
-                  placeholder="ឧ. R-001"
+                  label="ឈ្មោះពេញ" 
+                  v-model="formData.name" 
+                  placeholder="ឧ. សុខ សាន"
                 />
               </div>
               
               <div class="col-md-6">
-                <div class="input-group-custom">
-                  <label class="custom-label">ប្រភេទបន្ទប់</label>
-                  <select class="form-select custom-select" v-model="formData.type">
-                    <option value="បន្ទប់ធម្មតា">បន្ទប់ធម្មតា</option>
-                    <option value="បន្ទប់វីអាយភី">បន្ទប់វីអាយភី</option>
-                  </select>
-                </div>
+                <BaseInput 
+                  label="លេខទូរស័ព្ទ" 
+                  v-model="formData.phone" 
+                  placeholder="ឧ. 012 345 678"
+                />
               </div>
               
               <div class="col-md-6">
                 <BaseInput 
-                  label="តម្លៃជួល ($)" 
-                  type="number" 
-                  v-model="formData.price"
+                  label="ថ្ងៃចូលនៅ" 
+                  type="date" 
+                  v-model="formData.startDate"
                 />
               </div>
 
               <div class="col-12">
                 <div class="input-group-custom">
-                  <label class="custom-label">ពិពណ៌នាបន្ថែម</label>
+                  <label class="custom-label">ព័ត៌មានបន្ថែម (អត្តសញ្ញាណប័ណ្ណ...)</label>
                   <textarea 
                     class="form-control custom-textarea" 
                     rows="3" 
-                    v-model="formData.description"
-                    placeholder="បញ្ចូលព័ត៌មានបន្ថែមអំពីបន្ទប់..."
+                    v-model="formData.info"
+                    placeholder="បញ្ចូលព័ត៌មានបន្ថែមអំពីអ្នកជួល..."
                   ></textarea>
                 </div>
               </div>
@@ -75,7 +73,7 @@ const props = defineProps({
   show: Boolean,
   title: {
     type: String,
-    default: 'បង្កើតបន្ទប់ជួលថ្មី'
+    default: 'បន្ថែមអ្នកជួលថ្មី'
   }
 });
 
@@ -84,33 +82,32 @@ const emit = defineEmits(['close', 'submit']);
 const rentStore = useRentStore();
 const loading = ref(false);
 const formData = reactive({
-  roomNumber: '',
-  type: 'បន្ទប់ធម្មតា',
-  price: '',
-  description: ''
+  name: '',
+  phone: '',
+  startDate: new Date().toISOString().split('T')[0],
+  info: ''
 });
 
 const handleSubmit = async () => {
   loading.value = true;
   try {
-    await rentStore.createRoom({
-      id: formData.roomNumber,
-      type: formData.type,
-      price: formData.price,
-      description: formData.description,
-      status: 'ទំនេរ'
+    await rentStore.createTenant({
+      name: formData.name,
+      phone: formData.phone,
+      startDate: formData.startDate,
+      info: formData.info
     });
     emit('submit', { ...formData });
     emit('close');
     // Reset form
     Object.assign(formData, {
-      roomNumber: '',
-      type: 'បន្ទប់ធម្មតា',
-      price: '',
-      description: ''
+      name: '',
+      phone: '',
+      startDate: new Date().toISOString().split('T')[0],
+      info: ''
     });
   } catch (err) {
-    console.error("Failed to create room:", err);
+    console.error("Failed to create tenant:", err);
   } finally {
     loading.value = false;
   }
@@ -136,21 +133,18 @@ const handleSubmit = async () => {
   margin-left: 4px;
 }
 
-.custom-select, .custom-textarea {
+.custom-textarea {
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 12px;
   font-size: 0.95rem;
   transition: all 0.2s;
+  resize: none;
 }
 
-.custom-select:focus, .custom-textarea:focus {
+.custom-textarea:focus {
   border-color: #0d9488;
   box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
   outline: none;
-}
-
-.custom-textarea {
-  resize: none;
 }
 </style>

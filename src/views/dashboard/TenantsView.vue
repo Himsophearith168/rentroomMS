@@ -1,18 +1,20 @@
 <template>
   <div class="tenants-view">
+    <!-- ... header remains same ... -->
     <div class="header-section d-flex justify-content-between align-items-center mb-4">
       <div>
         <h1 class="display-6 fw-bold">បញ្ជីឈ្មោះអ្នកជួលទាំងអស់</h1>
         <p class="text-muted">គ្រប់គ្រងព័ត៌មាន និងទំនាក់ទំនងរបស់អ្នកជួល</p>
       </div>
-      <BaseButton variant="primary">
+      <BaseButton variant="primary" @click="isCreateModalOpen = true">
         <i class="bi bi-person-plus me-2"></i>បន្ថែមអ្នកជួល
       </BaseButton>
     </div>
 
+    <!-- ... cards ... -->
     <div class="row g-4 mb-4">
       <div class="col-12 col-md-4">
-        <StateCard label="អ្នកជួលសរុប" value="12" variant="blue">
+        <StateCard label="អ្នកជួលសរុប" :value="rentStore.tenants.length" variant="blue">
           <template #icon><i class="bi bi-people fs-4"></i></template>
         </StateCard>
       </div>
@@ -31,9 +33,9 @@
     <div class="card border-0 rounded-4 shadow-sm">
       <div class="card-body p-0">
         <BaseTable 
-          :items="mockTenants" 
+          :items="rentStore.tenants" 
           :fields="tableFields"
-          :totalRows="mockTenants.length"
+          :totalRows="rentStore.tenants.length"
           :perPage="10"
           :currentPage="1"
         >
@@ -49,7 +51,7 @@
             <span class="text-muted">{{ item.phone }}</span>
           </template>
           <template #cell(room)="{ item }">
-            <span class="badge bg-info-soft text-info">{{ item.room }}</span>
+            <span class="badge bg-info-soft text-info">{{ item.room || '-' }}</span>
           </template>
           <template #cell(actions)>
             <div class="d-flex gap-2">
@@ -60,14 +62,25 @@
         </BaseTable>
       </div>
     </div>
+
+    <CreateTenantModal 
+      :show="isCreateModalOpen" 
+      @close="isCreateModalOpen = false"
+      @submit="rentStore.fetchTenants"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useRentStore } from '@/stores/rentroom';
 import StateCard from '@/components/ui/StateCard.vue';
 import BaseTable from '@/components/ui/BaseTable.vue';
 import BaseButton from '@/components/ui/BaseButton.vue';
+import CreateTenantModal from '@/components/ui/CreateTenantModal.vue';
+
+const rentStore = useRentStore();
+const isCreateModalOpen = ref(false);
 
 const tableFields = [
   { key: 'name', label: 'ឈ្មោះអ្នកជួល', thClass: 'ps-4', tdClass: 'ps-4' },
@@ -77,13 +90,9 @@ const tableFields = [
   { key: 'actions', label: 'សកម្មភាព' }
 ];
 
-const mockTenants = ref([
-  { name: 'សុខ សាន', phone: '012 345 678', room: 'R-002', startDate: '2024-01-10' },
-  { name: 'កែវ សុភា', phone: '098 765 432', room: 'R-004', startDate: '2024-02-15' },
-  { name: 'ចាន់ ថន', phone: '085 111 222', room: 'R-006', startDate: '2024-03-01' },
-  { name: 'លី ហួរ', phone: '077 333 444', room: 'R-008', startDate: '2023-12-20' },
-  { name: 'មាស ស្រីនាថ', phone: '010 555 666', room: 'R-010', startDate: '2024-04-05' },
-]);
+onMounted(() => {
+  rentStore.fetchTenants();
+});
 </script>
 
 <style scoped>

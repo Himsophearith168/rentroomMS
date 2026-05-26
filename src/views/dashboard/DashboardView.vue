@@ -11,8 +11,8 @@
     <div class="row g-4 mb-5">
       <div class="col-12 col-md-4">
         <StateCard 
-          label="ចំនួនកំណត់ចំណាំ" 
-          :value="noteCount" 
+          label="ចំនួនបន្ទប់សរុប" 
+          :value="roomCount" 
           trendValue="12%" 
           variant="blue"
         >
@@ -25,7 +25,7 @@
       <div class="col-12 col-md-4">
         <StateCard 
           label="បន្ទប់ទំនេរ" 
-          value="5" 
+          :value="availableRooms" 
           trendValue="8%" 
           variant="green"
         >
@@ -38,7 +38,7 @@
       <div class="col-12 col-md-4">
         <StateCard 
           label="អ្នកជួលសរុប" 
-          value="12" 
+          :value="tenantCount" 
           trendValue="5%" 
           variant="yellow"
         >
@@ -48,7 +48,7 @@
         </StateCard>
       </div>
     </div>
-
+    
     <!-- Features Section -->
     <div class="section-title mb-3">
       <h2 class="h4 fw-bold mb-0">មុខងាររហ័ស</h2>
@@ -103,15 +103,14 @@
     <!-- Recent Data Table -->
     <div class="section-title mb-3 d-flex justify-content-between align-items-center">
       <h2 class="h4 fw-bold mb-0">បញ្ជីបន្ទប់ជួលថ្មីៗ</h2>
-      
     </div>
 
     <div class="card border-0 rounded-4 shadow-sm">
       <div class="card-body p-0">
         <BaseTable 
-          :items="mockRooms" 
+          :items="rentStore.rooms.slice(0, 5)" 
           :fields="tableFields"
-          :totalRows="mockRooms.length"
+          :totalRows="Math.min(rentStore.rooms.length, 5)"
           :perPage="5"
           :currentPage="1"
         >
@@ -130,15 +129,18 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { useNoteStore } from '@/stores/note';
+import { onMounted, computed } from 'vue';
+import { useRentStore } from '@/stores/rentroom';
 import StateCard from '@/components/ui/StateCard.vue';
 import BaseTable from '@/components/ui/BaseTable.vue';
 import FeaturesCard from '@/components/ui/FeaturesCard.vue';
 import BaseButton from '@/components/ui/BaseButton.vue';
 
-const noteStore = useNoteStore();
-const noteCount = computed(() => noteStore.notes?.length || 0);
+const rentStore = useRentStore();
+
+const roomCount = computed(() => rentStore.rooms?.length || 0);
+const availableRooms = computed(() => rentStore.rooms?.filter(r => r.status === 'ទំនេរ')?.length || 0);
+const tenantCount = computed(() => rentStore.tenants?.length || 0);
 
 const tableFields = [
   { key: 'id', label: 'លេខបន្ទប់', thClass: 'ps-4', tdClass: 'ps-4' },
@@ -148,13 +150,10 @@ const tableFields = [
   { key: 'tenant', label: 'អ្នកជួល' }
 ];
 
-const mockRooms = ref([
-  { id: 'R-001', type: 'បន្ទប់ធម្មតា', price: 50, status: 'ទំនេរ', tenant: '-' },
-  { id: 'R-002', type: 'បន្ទប់វីអាយភី', price: 100, status: 'មានអ្នកជួល', tenant: 'សុខ សាន' },
-  { id: 'R-003', type: 'បន្ទប់ធម្មតា', price: 50, status: 'ទំនេរ', tenant: '-' },
-  { id: 'R-004', type: 'បន្ទប់ធម្មតា', price: 50, status: 'មានអ្នកជួល', tenant: 'កែវ សុភា' },
-  { id: 'R-005', type: 'បន្ទប់វីអាយភី', price: 100, status: 'ទំនេរ', tenant: '-' },
-]);
+onMounted(() => {
+  rentStore.fetchRooms();
+  rentStore.fetchTenants();
+});
 </script>
 
 <style scoped>

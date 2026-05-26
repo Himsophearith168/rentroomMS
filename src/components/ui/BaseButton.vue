@@ -29,11 +29,11 @@ defineProps({
   },
   variant: {
     type: String,
-    default: "primary", // primary, secondary, outline, danger, ghost
+    default: "primary",
   },
   size: {
     type: String,
-    default: "md", // sm, md, lg
+    default: "md", 
   },
   loading: {
     type: Boolean,

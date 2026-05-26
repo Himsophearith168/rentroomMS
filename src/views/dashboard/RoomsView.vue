@@ -36,9 +36,9 @@
     <div class="card border-0 rounded-4 shadow-sm">
       <div class="card-body p-0">
         <BaseTable 
-          :items="mockRooms" 
+          :items="rentStore.rooms" 
           :fields="tableFields"
-          :totalRows="mockRooms.length"
+          :totalRows="rentStore.rooms.length"
           :perPage="10"
           :currentPage="1"
         >
@@ -63,10 +63,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { onMounted } from 'vue';
+import { useRentStore } from '@/stores/rentroom';
 import StateCard from '@/components/ui/StateCard.vue';
 import BaseTable from '@/components/ui/BaseTable.vue';
 import BaseButton from '@/components/ui/BaseButton.vue';
+
+const rentStore = useRentStore();
 
 const tableFields = [
   { key: 'id', label: 'លេខបន្ទប់', thClass: 'ps-4', tdClass: 'ps-4' },
@@ -77,16 +80,9 @@ const tableFields = [
   { key: 'actions', label: 'សកម្មភាព' }
 ];
 
-const mockRooms = ref([
-  { id: 'R-001', type: 'បន្ទប់ធម្មតា', price: 50, status: 'ទំនេរ', tenant: '-' },
-  { id: 'R-002', type: 'បន្ទប់វីអាយភី', price: 100, status: 'មានអ្នកជួល', tenant: 'សុខ សាន' },
-  { id: 'R-003', type: 'បន្ទប់ធម្មតា', price: 50, status: 'ទំនេរ', tenant: '-' },
-  { id: 'R-004', type: 'បន្ទប់ធម្មតា', price: 50, status: 'មានអ្នកជួល', tenant: 'កែវ សុភា' },
-  { id: 'R-005', type: 'បន្ទប់វីអាយភី', price: 100, status: 'ទំនេរ', tenant: '-' },
-  { id: 'R-006', type: 'បន្ទប់ធម្មតា', price: 45, status: 'មានអ្នកជួល', tenant: 'ចាន់ ថន' },
-  { id: 'R-007', type: 'បន្ទប់ធម្មតា', price: 45, status: 'ទំនេរ', tenant: '-' },
-  { id: 'R-008', type: 'បន្ទប់វីអាយភី', price: 120, status: 'មានអ្នកជួល', tenant: 'លី ហួរ' },
-]);
+onMounted(() => {
+  rentStore.fetchRooms();
+});
 </script>
 
 <style scoped>
