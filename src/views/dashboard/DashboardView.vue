@@ -5,12 +5,6 @@
         <h1 class="display-6 fw-bold">ផ្ទាំងគ្រប់គ្រង</h1>
         <p class="text-muted">សូមស្វាគមន៍មកកាន់ប្រព័ន្ធគ្រប់គ្រងផ្ទះជួល!</p>
       </div>
-      <BaseButton variant="primary" size="md">
-        <template #left-icon>
-          <i class="bi bi-plus-lg"></i>
-        </template>
-        បន្ថែមបន្ទប់ថ្មី
-      </BaseButton>
     </div>
     
     <!-- Statistic Cards -->
@@ -109,7 +103,7 @@
     <!-- Recent Data Table -->
     <div class="section-title mb-3 d-flex justify-content-between align-items-center">
       <h2 class="h4 fw-bold mb-0">បញ្ជីបន្ទប់ជួលថ្មីៗ</h2>
-      <BaseButton variant="outline" size="sm">មើលទាំងអស់</BaseButton>
+      
     </div>
 
     <div class="card border-0 rounded-4 shadow-sm">
