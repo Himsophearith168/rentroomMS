@@ -83,7 +83,7 @@ const rentStore = useRentStore();
 const isCreateModalOpen = ref(false);
 
 const tableFields = [
-  { key: 'name', label: 'ឈ្មោះអ្នកជួល', thClass: 'ps-4', tdClass: 'ps-4' },
+  { key: 'fullname', label: 'ឈ្មោះអ្នកជួល', thClass: 'ps-4', tdClass: 'ps-4' },
   { key: 'phone', label: 'លេខទូរស័ព្ទ' },
   { key: 'room', label: 'លេខបន្ទប់' },
   { key: 'startDate', label: 'ថ្ងៃចូលនៅ' },

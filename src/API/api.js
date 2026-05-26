@@ -1,10 +1,9 @@
 import axios from "axios";
 import { useAuthStore } from "@/stores/authentication";
+import router from "@/router";
 
 const api = axios.create({
-  baseURL:
-    import.meta.env.VITE_BASE_URL ||
-    "http://localhost:3000/api/v1",
+  baseURL: "/api",
 
   headers: {
     Accept: "application/json",
@@ -32,12 +31,19 @@ api.interceptors.response.use(
   },
   (error) => {
     const authStore = useAuthStore();
-    console.error(
-      `[API] Error (${error.response?.status}):`,
-      error.response?.data,
-    );
-    if (error.response?.status === 401) {
-      authStore.logout();
+    if (error.response) {
+      console.error(
+        `[API] Error (${error.response.status}):`,
+        error.response.data,
+      );
+      if (error.response.status === 401) {
+        authStore.logout();
+        router.push("/login");
+      }
+    } else if (error.request) {
+      console.error("[API] No response received:", error.request);
+    } else {
+      console.error("[API] Request error:", error.message);
     }
     return Promise.reject(error);
   },

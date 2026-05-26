@@ -5,6 +5,7 @@ import { useAuthStore } from "@/stores/authentication";
 import UserDashboardLayout from "@/layouts/UserDashboardLayout.vue";
 
 // Views
+import LoginView from "@/views/Authentication/LoginView.vue";
 import DashboardView from "@/views/dashboard/DashboardView.vue";
 import RoomsView from "@/views/dashboard/RoomsView.vue";
 import TenantsView from "@/views/dashboard/TenantsView.vue";
@@ -22,9 +23,15 @@ const router = createRouter({
       redirect: "/dashboard",
     },
     {
+      path: "/login",
+      name: "Login",
+      component: LoginView,
+      meta: { requiresAuth: false },
+    },
+    {
       path: "/dashboard",
       component: UserDashboardLayout,
-      meta: { requiresAuth: false }, // Set to false to allow viewing without login as requested
+      meta: { requiresAuth: true }, 
       children: [
         {
           path: "", 
@@ -58,15 +65,22 @@ const router = createRouter({
         },
       ],
     },
+    {
+      path: "/:pathMatch(.*)*",
+      redirect: "/dashboard",
+    },
   ], 
 });
 
 // Simple navigation guard
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    // If we had a login page, we'd redirect here
-    // For now, let's just proceed or redirect to dashboard
+  const isAuthenticated = authStore.isAuthenticated;
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+
+  if (requiresAuth && !isAuthenticated) {
+    next("/login");
+  } else if (to.name === "Login" && isAuthenticated) {
     next("/dashboard");
   } else {
     next();

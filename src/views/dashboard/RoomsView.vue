@@ -72,8 +72,8 @@ import BaseButton from '@/components/ui/BaseButton.vue';
 const rentStore = useRentStore();
 
 const tableFields = [
-  { key: 'id', label: 'លេខបន្ទប់', thClass: 'ps-4', tdClass: 'ps-4' },
-  { key: 'type', label: 'ប្រភេទបន្ទប់' },
+  { key: 'room_id', label: 'លេខរៀង', thClass: 'ps-4', tdClass: 'ps-4' },
+  { key: 'room_number', label: 'លេខបន្ទប់' },
   { key: 'price', label: 'តម្លៃជួល' },
   { key: 'status', label: 'ស្ថានភាព' },
   { key: 'tenant', label: 'អ្នកជួល' },

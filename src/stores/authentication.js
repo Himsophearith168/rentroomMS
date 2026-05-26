@@ -190,15 +190,17 @@ export const useAuthStore = defineStore("auth", () => {
         password: password.value,
       };
 
-      const response = await api.post("/auth/login", payload);
+      const response = await api.post("/login", payload);
       const data = response.data;
 
       if (data.result || data.success || response.status === 200) {
-        const tokenData = data.data;
-        const loggedInUser = tokenData?.user || tokenData;
+        // The backend returns an array in the data field
+        const responseData = Array.isArray(data.data) ? data.data[0] : data.data;
+        
+        const loggedInUser = responseData;
         const receivedToken =
-          tokenData?.token ||
-          tokenData?.access_token ||
+          responseData?.token ||
+          responseData?.access_token ||
           data.token ||
           data.access_token;
 
