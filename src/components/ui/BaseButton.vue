@@ -1,19 +1,23 @@
 <template>
-  <button :type="type" :disabled="disabled || loading" @click="onClick" :class="[
-    'btn d-flex align-items-center justify-content-center px-4 global-style',
-    btnClass,
-    { disabled: disabled || loading },
-  ]">
-    <!-- Loading -->
-    <template v-if="loading">
-      <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-      {{ loadingText }}
-    </template>
-
-    <!-- Normal -->
-    <template v-else>
-      <slot>Button</slot>
-    </template>
+  <button
+    :type="type"
+    :disabled="disabled || loading"
+    @click="onClick"
+    :class="[
+      'base-button',
+      `variant-${variant}`,
+      `size-${size}`,
+      { 'is-loading': loading, 'is-disabled': disabled || loading, 'is-full-width': fullWidth }
+    ]"
+  >
+    <!-- Loading Spinner -->
+    <span v-if="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+    
+    <span class="button-content" :class="{ 'invisible': loading }">
+      <slot name="icon-left"></slot>
+      <slot>{{ loading ? loadingText : 'Button' }}</slot>
+      <slot name="icon-right"></slot>
+    </span>
   </button>
 </template>
 
@@ -22,6 +26,14 @@ defineProps({
   type: {
     type: String,
     default: "button",
+  },
+  variant: {
+    type: String,
+    default: "primary", // primary, secondary, outline, danger, ghost
+  },
+  size: {
+    type: String,
+    default: "md", // sm, md, lg
   },
   loading: {
     type: Boolean,
@@ -33,12 +45,12 @@ defineProps({
   },
   loadingText: {
     type: String,
-    default: "Loading...",
+    default: "កំពុងដំណើរការ...",
   },
-  btnClass: {
-    type: String,
-    default: "w-fit",
-  },
+  fullWidth: {
+    type: Boolean,
+    default: false,
+  }
 });
 
 const emit = defineEmits(["click"]);
@@ -49,128 +61,105 @@ const onClick = (e) => {
 </script>
 
 <style scoped>
-.global-style {
-  font-family: var(--font-khmer);
-  gap: 10px;
-  padding: 15px 16px;
-  font-size: 18px;
-  font-weight: var(--font-weight-medium);
-  border-radius: var(--radius-md);
-  background: #003262 !important;
-  color: var(--color-bg-light);
-  transition: background 0.2s ease, opacity 0.2s ease;
+.base-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  font-family: inherit;
+  white-space: nowrap;
 }
 
-
-.global-style:hover:not(:disabled) {
-  background:#314158 !important;
-  color: var(--color-bg-light);
+.button-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-
-.global-style:active:not(:disabled) {
-  background: #314158 !important;
-  color: var(--color-bg-light);
+/* Variants */
+.variant-primary {
+  background: linear-gradient(135deg, #0d9488, #0f766e);
+  color: white;
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
 }
 
-.global-style:disabled,
-.global-style.disabled {
+.variant-primary:hover:not(.is-disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(13, 148, 136, 0.3);
+  background: linear-gradient(135deg, #0f766e, #115e59);
+}
+
+.variant-secondary {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.variant-secondary:hover:not(.is-disabled) {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.variant-outline {
+  background: transparent;
+  border: 1.5px solid #e2e8f0;
+  color: #64748b;
+}
+
+.variant-outline:hover:not(.is-disabled) {
+  border-color: #0d9488;
+  color: #0d9488;
+  background: rgba(13, 148, 136, 0.05);
+}
+
+.variant-danger {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.variant-danger:hover:not(.is-disabled) {
+  background: #fecaca;
+  color: #b91c1c;
+}
+
+/* Sizes */
+.size-sm {
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 10px;
+}
+
+.size-md {
+  padding: 12px 24px;
+  font-size: 16px;
+}
+
+.size-lg {
+  padding: 16px 32px;
+  font-size: 18px;
+}
+
+/* States */
+.is-full-width {
+  width: 100%;
+}
+
+.is-disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  background: var(--primary-color);
   pointer-events: none;
 }
 
-.btn-primary {
-  background: #1a6fdb;
-  color: #fff;
+.invisible {
+  visibility: hidden;
 }
 
-.btn-primary:hover:not(:disabled) {
-  background: #155fc0;
-}
-
-.btn-success {
-  background: #1D9E75;
-  color: #fff;
-}
-
-.btn-success:hover:not(:disabled) {
-  background: #168a65;
-}
-
-.btn-danger {
-  background: #E24B4A;
-  color: #fff;
-}
-
-.btn-danger:hover:not(:disabled) {
-  background: #cc3a39;
-}
-
-.btn-soft-primary {
-  background: #E6F1FB;
-  color: #185FA5;
-}
-
-.btn-soft-primary:hover:not(:disabled) {
-  background: #B5D4F4;
-}
-
-.btn-soft-success {
-  background: #E1F5EE;
-  color: #0F6E56;
-}
-
-.btn-soft-success:hover:not(:disabled) {
-  background: #9FE1CB;
-}
-
-.btn-soft-danger {
-  background: #FCEBEB;
-  color: #A32D2D;
-}
-
-.btn-soft-danger:hover:not(:disabled) {
-  background: #F7C1C1;
-}
-
-.btn-outline {
-  background: transparent;
-  border: 1.5px solid var(--color-border-secondary);
-  color: var(--color-text-secondary);
-  font-family: var(--font-khmer);
-  font-size: 13px;
-  font-weight: 700;
-  padding: 6px 14px;
-  border-radius: 7px;
-  transition: background 0.13s, border-color 0.13s, color 0.13s, transform 0.1s;
-}
-
-.btn-outline:hover:not(:disabled) {
-  background: var(--color-background-secondary);
-  border-color: var(--color-border-primary);
-  color: var(--color-text-primary);
-}
-
-.btn-outline:active:not(:disabled) {
-  transform: scale(0.95);
-}
-
-.btn-outline:disabled {
-  opacity: 0.42;
-  cursor: not-allowed;
-}
-
-.btn-cancel {
-  background: var(--color-background-primary);
-  color: var(--color-text-secondary);
-  border: 0.5px solid var(--color-border-secondary);
-}
-
-.btn-cancel:hover:not(:disabled) {
-  background: var(--color-background-secondary);
-  color: var(--color-text-primary);
+.spinner-border {
+  position: absolute;
 }
 </style>

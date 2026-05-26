@@ -6,6 +6,11 @@ import UserDashboardLayout from "@/layouts/UserDashboardLayout.vue";
 
 // Views
 import DashboardView from "@/views/dashboard/DashboardView.vue";
+import RoomsView from "@/views/dashboard/RoomsView.vue";
+import TenantsView from "@/views/dashboard/TenantsView.vue";
+import BillsView from "@/views/dashboard/BillsView.vue";
+import PaymentsView from "@/views/dashboard/PaymentsView.vue";
+import InvoicesView from "@/views/dashboard/InvoicesView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,14 +32,29 @@ const router = createRouter({
           component: DashboardView,
         },
         {
-          path: "all-tasks",
-          name: "AllTasks",
-          component: DashboardView,
+          path: "rooms",
+          name: "Rooms",
+          component: RoomsView,
         },
         {
-          path: "category/:name",
-          name: "Category",
-          component: DashboardView,
+          path: "tenants",
+          name: "Tenants",
+          component: TenantsView,
+        },
+        {
+          path: "bills",
+          name: "Bills",
+          component: BillsView,
+        },
+        {
+          path: "payments",
+          name: "Payments",
+          component: PaymentsView,
+        },
+        {
+          path: "invoices",
+          name: "Invoices",
+          component: InvoicesView,
         },
       ],
     },

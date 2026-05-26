@@ -9,6 +9,12 @@
         <RouterView />
       </div>
     </main>
+
+    <CreateRoomModal 
+      :show="isCreateModalOpen" 
+      @close="isCreateModalOpen = false" 
+      @submit="handleCreated"
+    />
   </div>
 </template>
 
@@ -18,16 +24,25 @@ import { useNoteStore } from "@/stores/note";
 
 import Sidebar from "@/components/userdashboard/Sidebar.vue";
 import Navbar from "@/components/userdashboard/Navbar.vue";
+import CreateRoomModal from "@/components/ui/CreateRoomModal.vue";
 
 const noteStore = useNoteStore();
 
-/* ================= SIDEBAR STATE ================= */
+/* ================= SIDEBAR & MODAL STATE ================= */
 const isSidebarOpen = ref(false);
+const isCreateModalOpen = ref(false);
+
+const toggleCreateModal = () => (isCreateModalOpen.value = !isCreateModalOpen.value);
 
 provide("sidebar", {
   isSidebarOpen,
   toggleSidebar: () => (isSidebarOpen.value = !isSidebarOpen.value),
   closeSidebar: () => (isSidebarOpen.value = false),
+});
+
+provide("modals", {
+  isCreateModalOpen,
+  toggleCreateModal
 });
 /* ================================================= */
 

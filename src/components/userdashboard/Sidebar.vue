@@ -36,7 +36,7 @@
         </router-link>
 
         <router-link
-          :to="{ name: 'AllTasks' }"
+          :to="{ name: 'Rooms' }"
           class="reab-nav-link"
           active-class="active"
           @click="handleNavClick"
@@ -45,12 +45,12 @@
           <span>បញ្ជីបន្ទប់ជួលទាំងអស់</span>
         </router-link>
         <router-link
-          :to="{ name: 'Category', params: { name: 'Personal' } }"
+          :to="{ name: 'Tenants' }"
           class="reab-nav-link"
           active-class="active"
           @click="handleNavClick"
         >
-          <i class="fas fa-list-ul"></i>
+          <i class="fas fa-users"></i>
           <span>បញ្ជីឈ្មោះអ្នកជួលទាំងអស់</span>
         </router-link>
 
@@ -64,33 +64,33 @@
         <p class="nav-label">ហិរញ្ញវត្ថុ និងវិក្កយបត្រ</p>
 
         <router-link
-          :to="{ name: 'Category', params: { name: 'Personal' } }"
+          :to="{ name: 'Bills' }"
           class="reab-nav-link"
           active-class="active"
           @click="handleNavClick"
         >
-          <i class="fas fa-user"></i>
+          <i class="fas fa-file-invoice-dollar"></i>
           <span>វិក្កយបត្រ (Bills)</span>
         </router-link>
 
         <router-link
-          :to="{ name: 'Category', params: { name: 'Work' } }"
+          :to="{ name: 'Payments' }"
           class="reab-nav-link"
           active-class="active"
           @click="handleNavClick"
         >
-          <i class="fas fa-briefcase"></i>
-          <span>ការទូទាត់ (Payments)វិ</span>
+          <i class="fas fa-money-check-alt"></i>
+          <span>ការទូទាត់ (Payments)</span>
         </router-link>
 
         <router-link
-          :to="{ name: 'Category', params: { name: 'Study' } }"
+          :to="{ name: 'Invoices' }"
           class="reab-nav-link"
           active-class="active"
           @click="handleNavClick"
         >
-          <i class="fas fa-graduation-cap"></i>
-          <span>ក្កយបត្រផ្លូវការ (Invoices)</span>
+          <i class="fas fa-file-contract"></i>
+          <span>វិក្កយបត្រផ្លូវការ (Invoices)</span>
         </router-link>
       </nav>
 
@@ -148,7 +148,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, inject } from "vue";
 import { useRouter } from "vue-router";
 import api from "@/API/api";
 import { useAuthStore } from "@/stores/authentication";
@@ -157,6 +157,7 @@ import { useSidebar } from "@/composable/Usesidebar";
 
 // ── Sidebar state — same singleton as Navbar ─────────────────────
 const { isSidebarOpen, closeSidebar } = useSidebar();
+const { toggleCreateModal } = inject("modals");
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -170,7 +171,7 @@ const handleNavClick = () => {
 
 const openCreateTask = () => {
   closeSidebar?.();
-  // taskCreateRef.value?.open(); 
+  toggleCreateModal(); 
 };
 const openLogoutModal = () => {
   showLogoutModal.value = true;
