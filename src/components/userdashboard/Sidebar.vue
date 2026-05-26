@@ -104,8 +104,6 @@
       
     </aside>
 
-    <TaskCreate ref="taskCreateRef" />
-
     <!-- Logout Modal -->
     <Teleport to="body">
       <Transition name="fade">
@@ -155,7 +153,6 @@ import { useRouter } from "vue-router";
 import api from "@/API/api";
 import { useAuthStore } from "@/stores/authentication";
 import { PlusCircle } from "lucide-vue-next";
-import TaskCreate from "@/views/user/Task/TaskCreate.vue"; // <-- adjust path
 import { useSidebar } from "@/composable/Usesidebar";
 
 // ── Sidebar state — same singleton as Navbar ─────────────────────
@@ -164,7 +161,6 @@ const { isSidebarOpen, closeSidebar } = useSidebar();
 const router = useRouter();
 const authStore = useAuthStore();
 
-const taskCreateRef = ref(null);
 const showLogoutModal = ref(false);
 const isLoggingOut = ref(false);
 
@@ -174,7 +170,7 @@ const handleNavClick = () => {
 
 const openCreateTask = () => {
   closeSidebar?.();
-  taskCreateRef.value?.open(); 
+  // taskCreateRef.value?.open(); 
 };
 const openLogoutModal = () => {
   showLogoutModal.value = true;

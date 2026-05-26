@@ -6,33 +6,9 @@
       <Navbar />
 
       <div class="content-padding">
-        <router-view
-          :key="refreshKey"
-          @create-task="openCreate"
-          @view-task="openView"
-          @edit-task="openEdit"
-        />
+        <RouterView />
       </div>
-
-      <TelegramConnectBot />
     </main>
-
-    <TaskCreate ref="createRef" @created="handleCreated" />
-
-    <TaskView
-      v-if="activeTask"
-      ref="viewModalRef"
-      :task="activeTask"
-      @mark-completed="onMarkCompleted"
-      @edit-task="openEdit"
-    />
-
-    <TaskUpdate
-      v-if="activeTask"
-      ref="editModalRef"
-      :task="activeTask"
-      @updated="onTaskUpdated"
-    />
   </div>
 </template>
 
@@ -42,10 +18,6 @@ import { useNoteStore } from "@/stores/note";
 
 import Sidebar from "@/components/userdashboard/Sidebar.vue";
 import Navbar from "@/components/userdashboard/Navbar.vue";
-import TaskCreate from "@/views/user/Task/TaskCreate.vue";
-import TaskView from "@/views/user/Task/TaskView.vue";
-import TaskUpdate from "@/views/user/Task/TaskUpdate.vue";
-import TelegramConnectBot from "@/views/pages/TelegramService/TelegramConnectBot.vue";
 
 const noteStore = useNoteStore();
 

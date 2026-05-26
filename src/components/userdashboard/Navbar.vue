@@ -69,7 +69,10 @@
         >
           <Search :size="18" />
         </button>
-        <ProfileDropdown />
+        <!-- Profile info placeholder -->
+        <div class="profile-placeholder">
+          <i class="bi bi-person-circle fs-4"></i>
+        </div>
       </div>
     </div>
   </nav>
@@ -80,8 +83,7 @@ import { ref, watch, onMounted, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import { useNoteStore } from "@/stores/note.js";
 import { useSidebar } from "@/composable/Usesidebar";
-import { Search, Moon } from "lucide-vue-next";
-import ProfileDropdown from "../../components/profile/ProfileDropdown.vue";
+import { Search, Moon, X } from "lucide-vue-next";
 const router = useRouter();
 const noteStore = useNoteStore();
 
