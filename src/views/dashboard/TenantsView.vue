@@ -39,12 +39,12 @@
           :perPage="10"
           :currentPage="1"
         >
-          <template #cell(name)="{ item }">
+          <template #cell(fullname)="{ item }">
             <div class="d-flex align-items-center">
               <div class="avatar-sm me-3 bg-light rounded-circle d-flex align-items-center justify-content-center">
                 <i class="bi bi-person text-secondary"></i>
               </div>
-              <span class="fw-medium">{{ item.name }}</span>
+              <span class="fw-medium">{{ item.fullname }}</span>
             </div>
           </template>
           <template #cell(phone)="{ item }">

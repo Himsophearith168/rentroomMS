@@ -43,8 +43,8 @@
           :currentPage="1"
         >
           <template #cell(status)="{ item }">
-            <span :class="['badge rounded-pill', item.status === 'ទំនេរ' ? 'bg-success-soft text-success' : 'bg-warning-soft text-warning']">
-              {{ item.status }}
+            <span :class="['badge rounded-pill', item.status === 'Available' ? 'bg-success-soft text-success' : 'bg-warning-soft text-warning']">
+              {{ item.status === 'Available' ? 'ទំនេរ' : 'មានអ្នកជួល' }}
             </span>
           </template>
           <template #cell(price)="{ item }">

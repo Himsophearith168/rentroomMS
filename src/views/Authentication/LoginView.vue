@@ -29,10 +29,10 @@
             <form @submit.prevent="handleLogin">
               <div class="mb-4">
                 <BaseInput 
-                  label="អ៊ីមែល" 
-                  type="email" 
+                  label="អ៊ីមែល ឬ ឈ្មោះអ្នកប្រើ" 
+                  type="text" 
                   v-model="authStore.email" 
-                  placeholder="name@example.com"
+                  placeholder="admin@gmail.com ឬ admin"
                   required
                 />
               </div>

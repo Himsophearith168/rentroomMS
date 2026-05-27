@@ -115,8 +115,8 @@
           :currentPage="1"
         >
           <template #cell(status)="{ item }">
-            <span :class="['badge rounded-pill', item.status === 'ទំនេរ' ? 'bg-success-soft text-success' : 'bg-warning-soft text-warning']">
-              {{ item.status }}
+            <span :class="['badge rounded-pill', item.status === 'Available' ? 'bg-success-soft text-success' : 'bg-warning-soft text-warning']">
+              {{ item.status === 'Available' ? 'ទំនេរ' : 'មានអ្នកជួល' }}
             </span>
           </template>
           <template #cell(price)="{ item }">
@@ -139,12 +139,11 @@ import BaseButton from '@/components/ui/BaseButton.vue';
 const rentStore = useRentStore();
 
 const roomCount = computed(() => rentStore.rooms?.length || 0);
-const availableRooms = computed(() => rentStore.rooms?.filter(r => r.status === 'ទំនេរ')?.length || 0);
+const availableRooms = computed(() => rentStore.rooms?.filter(r => r.status === 'Available')?.length || 0);
 const tenantCount = computed(() => rentStore.tenants?.length || 0);
 
 const tableFields = [
-  { key: 'id', label: 'លេខបន្ទប់', thClass: 'ps-4', tdClass: 'ps-4' },
-  { key: 'type', label: 'ប្រភេទបន្ទប់' },
+  { key: 'room_number', label: 'លេខបន្ទប់', thClass: 'ps-4', tdClass: 'ps-4' },
   { key: 'price', label: 'តម្លៃជួល' },
   { key: 'status', label: 'ស្ថានភាព' },
   { key: 'tenant', label: 'អ្នកជួល' }

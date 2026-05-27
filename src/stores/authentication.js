@@ -120,7 +120,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   const canLogin = computed(() => {
     return (
-      email.value.includes("@") && password.value.length >= 6 && !loading.value
+      email.value.length >= 2 && password.value.length >= 6 && !loading.value
     );
   });
 
@@ -194,7 +194,6 @@ export const useAuthStore = defineStore("auth", () => {
       const data = response.data;
 
       if (data.result || data.success || response.status === 200) {
-        // The backend returns an array in the data field
         const responseData = Array.isArray(data.data) ? data.data[0] : data.data;
         
         const loggedInUser = responseData;
@@ -209,7 +208,6 @@ export const useAuthStore = defineStore("auth", () => {
           loading.value = false;
           return false;
         }
-        // ─────────────────────────────────────────────────────────
 
         if (!receivedToken) {
           error.value = "No token received from server";

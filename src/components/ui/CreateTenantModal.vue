@@ -13,7 +13,7 @@
               <div class="col-12">
                 <BaseInput 
                   label="ឈ្មោះពេញ" 
-                  v-model="formData.name" 
+                  v-model="formData.fullname" 
                   placeholder="ឧ. សុខ សាន"
                 />
               </div>
@@ -82,7 +82,7 @@ const emit = defineEmits(['close', 'submit']);
 const rentStore = useRentStore();
 const loading = ref(false);
 const formData = reactive({
-  name: '',
+  fullname: '',
   phone: '',
   startDate: new Date().toISOString().split('T')[0],
   info: ''
@@ -92,7 +92,7 @@ const handleSubmit = async () => {
   loading.value = true;
   try {
     await rentStore.createTenant({
-      name: formData.name,
+      fullname: formData.fullname,
       phone: formData.phone,
       startDate: formData.startDate,
       info: formData.info
@@ -101,7 +101,7 @@ const handleSubmit = async () => {
     emit('close');
     // Reset form
     Object.assign(formData, {
-      name: '',
+      fullname: '',
       phone: '',
       startDate: new Date().toISOString().split('T')[0],
       info: ''
