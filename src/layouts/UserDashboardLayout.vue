@@ -101,19 +101,21 @@ const onTaskUpdated = (task) => {
   display: flex;
   min-height: 100vh;
   width: 100%;
-  background-color: #f8f9fa;
+  background-color: var(--bg-body);
 }
 
 /* Desktop layout */
 .main-wrapper {
-  margin-left: 280px;
-  width: calc(100% - 280px);
+  margin-left: var(--sidebar-width);
+  width: calc(100% - var(--sidebar-width));
+  display: flex;
+  flex-direction: column;
 }
 
 /* Content spacing */
 .content-padding {
-  min-height: 100vh;
-  padding:6px 18px;
+  flex: 1;
+  padding: var(--content-padding);
 }
 
 /* ================= MOBILE ================= */
@@ -124,13 +126,7 @@ const onTaskUpdated = (task) => {
   }
 
   .content-padding {
-    padding-top: 64px;
-  }
-}
-
-@media (max-width: 680px) {
-  .content-padding {
-    padding: 12px;
+    padding: 20px;
   }
 }
 </style>

@@ -30,31 +30,38 @@ defineProps({
 
 <style scoped>
 .feature-card {
-  background-color: #ffffff;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-soft);
+  transition: var(--transition);
   display: flex;
   flex-direction: column;
   gap: 20px;
   height: 100%;
-  border: 1px solid transparent;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
 }
 
 .feature-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-light);
 }
 
 .icon-wrapper {
   width: 52px;
   height: 52px;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ffffff;
+  transition: var(--transition);
+}
+
+.feature-card:hover .icon-wrapper {
+  transform: scale(1.1) rotate(5deg);
 }
 
 .text-content {
@@ -65,18 +72,16 @@ defineProps({
 }
 
 .title {
-  font-family: var(--font-khmer);
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 700;
-  color: #1A365D; /* ពណ៌ខៀវចាស់ដូចក្នុងរូប */
+  color: var(--text-main);
   margin: 0;
   line-height: 1.4;
 }
 
 .description {
-  font-family: var(--font-khmer);
-  font-size: 12px;
-  color: #718096;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
   margin: 0;
   line-height: 1.6;
 }

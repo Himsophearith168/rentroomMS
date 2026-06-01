@@ -36,35 +36,70 @@
         </router-link>
 
         <router-link
-          :to="{ name: 'Rooms' }"
+          :to="{ name: 'Users' }"
           class="reab-nav-link"
           active-class="active"
           @click="handleNavClick"
         >
-          <i class="fas fa-list-ul"></i>
-          <span>បញ្ជីបន្ទប់ជួលទាំងអស់</span>
+          <i class="fas fa-user-shield"></i>
+          <span>អ្នកប្រើប្រាស់</span>
+        </router-link>
+
+        <p class="nav-label">ការគ្រប់គ្រងបន្ទប់ និងអ្នកជួល</p>
+
+        <router-link
+          :to="{ name: 'Room' }"
+          class="reab-nav-link"
+          active-class="active"
+          @click="handleNavClick"
+        >
+          <i class="fas fa-door-open"></i>
+          <span>បន្ទប់ជួល</span>
         </router-link>
         <router-link
-          :to="{ name: 'Tenants' }"
+          :to="{ name: 'Tenant' }"
           class="reab-nav-link"
           active-class="active"
           @click="handleNavClick"
         >
           <i class="fas fa-users"></i>
-          <span>បញ្ជីឈ្មោះអ្នកជួលទាំងអស់</span>
+          <span>អ្នកជួល</span>
         </router-link>
 
-        <p class="nav-label">សកម្មភាពទូទៅ</p>
+        <p class="nav-label">សេវាកម្ម និងការវាស់វែង</p>
 
-        <a href="#" class="reab-nav-link" @click.prevent="openCreateTask">
-          <PlusCircle :size="18" />
-          <span>បង្កើតបន្ទប់ជួលថ្មី</span>
-        </a>
+        <router-link
+          :to="{ name: 'UtilityMeter' }"
+          class="reab-nav-link"
+          active-class="active"
+          @click="handleNavClick"
+        >
+          <i class="fas fa-tachometer-alt"></i>
+          <span>ការវាស់ស្ទង់ម៉ែត្រ</span>
+        </router-link>
+        <router-link
+          :to="{ name: 'Utility' }"
+          class="reab-nav-link"
+          active-class="active"
+          @click="handleNavClick"
+        >
+          <i class="fas fa-dollar-sign"></i>
+          <span>តម្លៃសេវាកម្ម</span>
+        </router-link>
+        <router-link
+          :to="{ name: 'UtilityType' }"
+          class="reab-nav-link"
+          active-class="active"
+          @click="handleNavClick"
+        >
+          <i class="fas fa-cogs"></i>
+          <span>ប្រភេទសេវាកម្ម</span>
+        </router-link>
 
         <p class="nav-label">ហិរញ្ញវត្ថុ និងវិក្កយបត្រ</p>
 
         <router-link
-          :to="{ name: 'Bills' }"
+          :to="{ name: 'Bill' }"
           class="reab-nav-link"
           active-class="active"
           @click="handleNavClick"
@@ -74,7 +109,17 @@
         </router-link>
 
         <router-link
-          :to="{ name: 'Payments' }"
+          :to="{ name: 'BillDetail' }"
+          class="reab-nav-link"
+          active-class="active"
+          @click="handleNavClick"
+        >
+          <i class="fas fa-list-ol"></i>
+          <span>លម្អិតវិក្កយបត្រ</span>
+        </router-link>
+
+        <router-link
+          :to="{ name: 'Payment' }"
           class="reab-nav-link"
           active-class="active"
           @click="handleNavClick"
@@ -84,7 +129,7 @@
         </router-link>
 
         <router-link
-          :to="{ name: 'Invoices' }"
+          :to="{ name: 'Invoice' }"
           class="reab-nav-link"
           active-class="active"
           @click="handleNavClick"
@@ -200,176 +245,130 @@ const handleLogout = async () => {
   top: 0;
   left: 0;
   bottom: 0;
-  width: 280px;
+  width: var(--sidebar-width);
   height: 100vh;
-  padding: 32px 24px;
+  padding: 32px 20px;
   display: flex;
   flex-direction: column;
-  background: #ffffffe6;
-  backdrop-filter: blur(20px);
-  border-right: 1px solid rgba(226, 232, 240, 0.8);
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
   z-index: 1100;
-  transform: translateX(0);
-  transition:
-    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.3s ease;
+  transition: var(--transition);
   overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-#reab-sidebar::-webkit-scrollbar {
-  display: none;
-}
-
-/* Mobile: hidden off-screen, slides in on .open ────────────────── */
-@media (max-width: 900px) {
-  #reab-sidebar {
-    transform: translateX(-100%);
-    box-shadow: none;
-  }
-  #reab-sidebar.open {
-    transform: translateX(0);
-    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.18);
-  }
-}
-
-/* Overlay ──────────────────────────────────────────────────────── */
-.sidebar-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(1px);
-  z-index: 1000;
-}
-.overlay-fade-enter-active,
-.overlay-fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-.overlay-fade-enter-from,
-.overlay-fade-leave-to {
-  opacity: 0;
 }
 
 /* Brand ─────────────────────────────────────────────────────────── */
-.logo-sticky {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-}
 .logo-section {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 30px;
-  padding-left: 8px;
+  margin-bottom: 40px;
+  padding: 0 12px;
 }
+
 .brand-area {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   text-decoration: none;
-  padding-left: 12px;
-  margin-left: -10px;
 }
+
 .brand-logo {
-  width: 46px;
-  height: 46px;
-  background: linear-gradient(145deg, #14b8a6, #0d9488);
-  border-radius: 14px;
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, var(--primary), #14b8a6);
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 1.4rem;
-  box-shadow:
-    0 1px 2px rgba(13, 148, 136, 0.55),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
-  transition: transform 0.35s ease;
-}
-.brand-area:hover .brand-logo {
-  transform: scale(1.1);
-}
-.brand-name {
-  font-weight: 900;
   font-size: 1.5rem;
-  letter-spacing: -0.03em;
-  color: var(--text-main);
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
+  transition: var(--transition);
 }
+
+.brand-area:hover .brand-logo {
+  transform: scale(1.05) rotate(-5deg);
+}
+
+.brand-name {
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+}
+
 .brand-color {
   color: var(--primary);
-  letter-spacing: 1px;
-}
-.brand-last-color {
-  color: rgb(15, 69, 69);
-  letter-spacing: 1px;
 }
 
 /* Nav ───────────────────────────────────────────────────────────── */
 .nav-label {
-  margin: 24px 0 12px 16px;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 2px;
+  margin: 24px 0 8px 16px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #64748b;
+  color: var(--text-light);
 }
+
 .reab-nav-link {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
   margin-bottom: 4px;
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 0.9375rem;
+  font-weight: 600;
   text-decoration: none;
-  color: #64748b;
-  border-radius: 14px;
-  position: relative;
-  transition: all 0.2s ease;
+  color: var(--text-muted);
+  border-radius: var(--radius-md);
+  transition: var(--transition);
 }
+
+.reab-nav-link i {
+  font-size: 1.1rem;
+  width: 20px;
+  text-align: center;
+}
+
 .reab-nav-link:hover {
-  background: rgba(13, 148, 136, 0.05);
-  color: #0d9488;
+  background: var(--primary-soft);
+  color: var(--primary);
+  transform: translateX(4px);
 }
+
 .reab-nav-link.active {
-  background: rgba(13, 148, 136, 0.1);
-  color: #0d9488;
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
 }
-.reab-nav-link.active::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: -24px;
-  bottom: 0;
-  width: 5px;
-  background: #0d9488;
-  border-radius: 4px 0 0 4px;
+
+.reab-nav-link.active i {
+  color: white;
 }
 
 /* Logout ────────────────────────────────────────────────────────── */
 .btn-logout {
   width: 100%;
-  margin-top: 12px;
-  padding: 14px;
+  margin-top: 20px;
+  padding: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  font-weight: 800;
+  font-size: 0.875rem;
+  font-weight: 700;
   cursor: pointer;
-  background: #fff;
-  border: 1.5px solid #fca5a5;
-  border-radius: 14px;
-  color: #ef4444;
-  transition: all 0.3s ease;
+  background: transparent;
+  border: 1.5px solid var(--danger-soft);
+  border-radius: var(--radius-md);
+  color: var(--danger);
+  transition: var(--transition);
 }
+
 .btn-logout:hover {
-  background: #fef2f2;
-  border-color: #ef4444;
-}
-.btn-logout i {
-  font-size: 1.1rem;
+  background: var(--danger-soft);
+  border-color: var(--danger);
 }
 
 /* Logout modal ──────────────────────────────────────────────────── */

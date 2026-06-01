@@ -1,65 +1,54 @@
 <template>
-  <BaseModal :show="show" @close="emit('close')">
-    <template #modal>
-      <div class="modal-content border-0 rounded-4 shadow-lg">
-        <div class="modal-header border-0 pb-0 pt-4 px-4 d-flex justify-content-between align-items-center">
-          <h5 class="modal-title fw-bold fs-4">{{ title }}</h5>
-          <button type="button" class="btn-close" @click="emit('close')"></button>
+  <BaseModal :show="show" :title="title" @close="emit('close')">
+    <form @submit.prevent="handleSubmit">
+      <div class="row g-4">
+        <div class="col-12">
+          <BaseInput 
+            label="លេខបន្ទប់" 
+            v-model="formData.room_number" 
+            placeholder="ឧ. R-001"
+          />
         </div>
         
-        <div class="modal-body p-4">
-          <form @submit.prevent="handleSubmit">
-            <div class="row g-4">
-              <div class="col-12">
-                <BaseInput 
-                  label="លេខបន្ទប់" 
-                  v-model="formData.roomNumber" 
-                  placeholder="ឧ. R-001"
-                />
-              </div>
-              
-              <div class="col-md-6">
-                <div class="input-group-custom">
-                  <label class="custom-label">ប្រភេទបន្ទប់</label>
-                  <select class="form-select custom-select" v-model="formData.type">
-                    <option value="បន្ទប់ធម្មតា">បន្ទប់ធម្មតា</option>
-                    <option value="បន្ទប់វីអាយភី">បន្ទប់វីអាយភី</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div class="col-md-6">
-                <BaseInput 
-                  label="តម្លៃជួល ($)" 
-                  type="number" 
-                  v-model="formData.price"
-                />
-              </div>
-
-              <div class="col-12">
-                <div class="input-group-custom">
-                  <label class="custom-label">ពិពណ៌នាបន្ថែម</label>
-                  <textarea 
-                    class="form-control custom-textarea" 
-                    rows="3" 
-                    v-model="formData.description"
-                    placeholder="បញ្ចូលព័ត៌មានបន្ថែមអំពីបន្ទប់..."
-                  ></textarea>
-                </div>
-              </div>
-            </div>
-          </form>
+        <div class="col-md-6">
+          <BaseInput 
+            label="ជាន់ទី" 
+            type="number" 
+            v-model="formData.floor_number"
+            placeholder="ឧ. 1"
+          />
+        </div>
+        
+        <div class="col-md-6">
+          <BaseInput 
+            label="តម្លៃជួល ($)" 
+            type="number" 
+            v-model="formData.room_price"
+            placeholder="ឧ. 100"
+          />
         </div>
 
-        <div class="modal-footer border-0 pt-0 pb-4 px-4 gap-2">
-          <BaseButton variant="secondary" @click="emit('close')" fullWidth>
-            បោះបង់
-          </BaseButton>
-          <BaseButton variant="primary" @click="handleSubmit" :loading="loading" fullWidth>
-            រក្សាទុក
-          </BaseButton>
+        <div class="col-12">
+          <div class="input-group-custom">
+            <label class="custom-label">ពិពណ៌នាបន្ថែម</label>
+            <textarea 
+              class="form-control custom-textarea" 
+              rows="3" 
+              v-model="formData.description"
+              placeholder="បញ្ចូលព័ត៌មានបន្ថែមអំពីបន្ទប់..."
+            ></textarea>
+          </div>
         </div>
       </div>
+    </form>
+
+    <template #footer>
+      <BaseButton variant="secondary" @click="emit('close')" fullWidth>
+        បោះបង់
+      </BaseButton>
+      <BaseButton variant="primary" @click="handleSubmit" :loading="loading" fullWidth>
+        រក្សាទុក
+      </BaseButton>
     </template>
   </BaseModal>
 </template>
@@ -84,9 +73,9 @@ const emit = defineEmits(['close', 'submit']);
 const rentStore = useRentStore();
 const loading = ref(false);
 const formData = reactive({
-  roomNumber: '',
-  type: 'បន្ទប់ធម្មតា',
-  price: '',
+  room_number: '',
+  room_price: '',
+  floor_number: '',
   description: ''
 });
 
@@ -94,19 +83,19 @@ const handleSubmit = async () => {
   loading.value = true;
   try {
     await rentStore.createRoom({
-      id: formData.roomNumber,
-      type: formData.type,
-      price: formData.price,
+      room_number: formData.room_number,
+      room_price: formData.room_price,
+      floor_number: formData.floor_number,
       description: formData.description,
-      status: 'ទំនេរ'
+      status: 'Available'
     });
     emit('submit', { ...formData });
     emit('close');
     // Reset form
     Object.assign(formData, {
-      roomNumber: '',
-      type: 'បន្ទប់ធម្មតា',
-      price: '',
+      room_number: '',
+      room_price: '',
+      floor_number: '',
       description: ''
     });
   } catch (err) {
@@ -118,10 +107,6 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-.modal-content {
-  overflow: hidden;
-}
-
 .input-group-custom {
   position: relative;
   display: flex;
@@ -129,28 +114,28 @@ const handleSubmit = async () => {
 }
 
 .custom-label {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 600;
-  color: #718096;
-  margin-bottom: 4px;
-  margin-left: 4px;
-}
-
-.custom-select, .custom-textarea {
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 12px;
-  font-size: 0.95rem;
-  transition: all 0.2s;
-}
-
-.custom-select:focus, .custom-textarea:focus {
-  border-color: #0d9488;
-  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
-  outline: none;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  margin-left: 2px;
 }
 
 .custom-textarea {
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-main);
+  background-color: var(--bg-card);
+  transition: var(--transition);
   resize: none;
+}
+
+.custom-textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--primary-soft);
+  outline: none;
 }
 </style>

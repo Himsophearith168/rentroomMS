@@ -1,63 +1,79 @@
 <template>
-  <BaseModal :show="show" @close="emit('close')">
-    <template #modal>
-      <div class="modal-content border-0 rounded-4 shadow-lg">
-        <div class="modal-header border-0 pb-0 pt-4 px-4 d-flex justify-content-between align-items-center">
-          <h5 class="modal-title fw-bold fs-4">{{ title }}</h5>
-          <button type="button" class="btn-close" @click="emit('close')"></button>
+  <BaseModal :show="show" :title="title" size="lg" @close="emit('close')">
+    <form @submit.prevent="handleSubmit">
+      <div class="row g-4">
+        <div class="col-md-8">
+          <BaseInput 
+            label="ឈ្មោះពេញ" 
+            v-model="formData.fullname" 
+            placeholder="ឧ. សុខ សាន"
+            required
+          />
         </div>
         
-        <div class="modal-body p-4">
-          <form @submit.prevent="handleSubmit">
-            <div class="row g-4">
-              <div class="col-12">
-                <BaseInput 
-                  label="ឈ្មោះពេញ" 
-                  v-model="formData.fullname" 
-                  placeholder="ឧ. សុខ សាន"
-                />
-              </div>
-              
-              <div class="col-md-6">
-                <BaseInput 
-                  label="លេខទូរស័ព្ទ" 
-                  v-model="formData.phone" 
-                  placeholder="ឧ. 012 345 678"
-                />
-              </div>
-              
-              <div class="col-md-6">
-                <BaseInput 
-                  label="ថ្ងៃចូលនៅ" 
-                  type="date" 
-                  v-model="formData.startDate"
-                />
-              </div>
-
-              <div class="col-12">
-                <div class="input-group-custom">
-                  <label class="custom-label">ព័ត៌មានបន្ថែម (អត្តសញ្ញាណប័ណ្ណ...)</label>
-                  <textarea 
-                    class="form-control custom-textarea" 
-                    rows="3" 
-                    v-model="formData.info"
-                    placeholder="បញ្ចូលព័ត៌មានបន្ថែមអំពីអ្នកជួល..."
-                  ></textarea>
-                </div>
-              </div>
-            </div>
-          </form>
+        <div class="col-md-4">
+          <div class="input-group-custom">
+            <label class="custom-label">ភេទ</label>
+            <select class="form-select custom-select" v-model="formData.gender">
+              <option value="Male">ប្រុស</option>
+              <option value="Female">ស្រី</option>
+            </select>
+          </div>
         </div>
 
-        <div class="modal-footer border-0 pt-0 pb-4 px-4 gap-2">
-          <BaseButton variant="secondary" @click="emit('close')" fullWidth>
-            បោះបង់
-          </BaseButton>
-          <BaseButton variant="primary" @click="handleSubmit" :loading="loading" fullWidth>
-            រក្សាទុក
-          </BaseButton>
+        <div class="col-md-6">
+          <BaseInput 
+            label="លេខទូរស័ព្ទ" 
+            v-model="formData.phone" 
+            placeholder="ឧ. 012 345 678"
+          />
+        </div>
+        
+        <div class="col-md-6">
+          <BaseInput 
+            label="តេឡេក្រាម" 
+            v-model="formData.telegram" 
+            placeholder="ឧ. @username"
+          />
+        </div>
+
+        <div class="col-md-6">
+          <BaseInput 
+            label="អត្តសញ្ញាណប័ណ្ណ" 
+            v-model="formData.id_card" 
+            placeholder="លេខអត្តសញ្ញាណប័ណ្ណ"
+          />
+        </div>
+
+        <div class="col-md-6">
+          <BaseInput 
+            label="លេខទំនាក់ទំនងអាសន្ន" 
+            v-model="formData.emergency_contact" 
+            placeholder="ឈ្មោះ និងលេខទូរស័ព្ទ"
+          />
+        </div>
+
+        <div class="col-12">
+          <div class="input-group-custom">
+            <label class="custom-label">អាសយដ្ឋាន</label>
+            <textarea 
+              class="form-control custom-textarea" 
+              rows="2" 
+              v-model="formData.address"
+              placeholder="បញ្ចូលអាសយដ្ឋាន..."
+            ></textarea>
+          </div>
         </div>
       </div>
+    </form>
+
+    <template #footer>
+      <BaseButton variant="secondary" @click="emit('close')" fullWidth>
+        បោះបង់
+      </BaseButton>
+      <BaseButton variant="primary" @click="handleSubmit" :loading="loading" fullWidth>
+        រក្សាទុក
+      </BaseButton>
     </template>
   </BaseModal>
 </template>
@@ -83,28 +99,29 @@ const rentStore = useRentStore();
 const loading = ref(false);
 const formData = reactive({
   fullname: '',
+  gender: 'Male',
   phone: '',
-  startDate: new Date().toISOString().split('T')[0],
-  info: ''
+  telegram: '',
+  id_card: '',
+  emergency_contact: '',
+  address: ''
 });
 
 const handleSubmit = async () => {
   loading.value = true;
   try {
-    await rentStore.createTenant({
-      fullname: formData.fullname,
-      phone: formData.phone,
-      startDate: formData.startDate,
-      info: formData.info
-    });
+    await rentStore.createTenant({ ...formData });
     emit('submit', { ...formData });
     emit('close');
     // Reset form
     Object.assign(formData, {
       fullname: '',
+      gender: 'Male',
       phone: '',
-      startDate: new Date().toISOString().split('T')[0],
-      info: ''
+      telegram: '',
+      id_card: '',
+      emergency_contact: '',
+      address: ''
     });
   } catch (err) {
     console.error("Failed to create tenant:", err);
@@ -115,10 +132,6 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-.modal-content {
-  overflow: hidden;
-}
-
 .input-group-custom {
   position: relative;
   display: flex;
@@ -131,6 +144,20 @@ const handleSubmit = async () => {
   color: #718096;
   margin-bottom: 4px;
   margin-left: 4px;
+}
+
+.custom-select {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.custom-select:focus {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+  outline: none;
 }
 
 .custom-textarea {

@@ -63,15 +63,15 @@ onUnmounted(() => {
 .dropdown-menu {
     position: absolute;
     top: 100%;
-    z-index: 999;
-    /* Bumped up slightly to guarantee it sits above dashboard headers */
-    min-width: 160px;
-    margin-top: 4px;
-    background-color: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    padding: 4px 0;
+    z-index: 1200;
+    min-width: 200px;
+    margin-top: 8px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    padding: 8px;
+    transform-origin: top;
 }
 
 /* Alignment positions relative to parent container */
@@ -88,12 +88,12 @@ onUnmounted(() => {
 /* Clean, modern micro-interaction transitions */
 .dropdown-fade-enter-active,
 .dropdown-fade-leave-active {
-    transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dropdown-fade-enter-from,
 .dropdown-fade-leave-to {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translateY(-10px) scale(0.95);
 }
 </style>

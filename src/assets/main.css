@@ -1,76 +1,146 @@
-@font-face {
-  font-family: "Poppins";
-  src: url("@/assets/fonts/Poppins-Regular.ttf") format("truetype");
-  font-weight: 400;
-}
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Kantumruy+Pro:ital,wght@0,100..700;1,100..700&display=swap');
 
-@font-face {
-  font-family: "Kantumruy Pro";
-  src: url("@/assets/fonts/KantumruyPro-Regular.ttf") format("truetype");
-  font-weight: 400;
+:root {
+  /* Core Palette - Refined Teal */
+  --primary: #0d9488;
+  --primary-hover: #0f766e;
+  --primary-active: #115e59;
+  --primary-soft: #f0fdfa;
+  --primary-light: #ccfbf1;
+  
+  /* Brand Accents */
+  --accent: #f59e0b;
+  --accent-soft: #fffbeb;
+  --danger: #ef4444;
+  --danger-soft: #fef2f2;
+  --success: #10b981;
+  --success-soft: #ecfdf5;
+  --info: #3b82f6;
+  --info-soft: #eff6ff;
+  
+  /* Neutral Palette - Slate */
+  --bg-body: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-sidebar: #ffffff;
+  
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  --text-inverse: #ffffff;
+  
+  /* Borders & Surfaces */
+  --border-color: #f1f5f9;
+  --border-hover: #e2e8f0;
+  --surface-alt: #f1f5f9;
+  
+  /* Layout */
+  --sidebar-width: 280px;
+  --header-height: 72px;
+  --content-padding: 32px;
+  
+  /* Effects */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+  
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-soft: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+  
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  --font-main: "Inter", "Kantumruy Pro", sans-serif;
 }
 
 * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: "Poppins", "Kantumruy Pro", sans-serif;
-}
-
-:root {
-  --primary: #13707f;
-  --brand-light: #f0f9fa;
-  --brand-hover: #0e5661;
-  --sidebar-width: 280px;
-  --bg-body: #f8fafb;
-  --card-radius: 1.25rem;
-  --border-color: #edf2f7;
-  --primary-light: #E8F4F5;
-  --primary-hover: #0f5c69;
-  --primary-soft: #f0f9fa;
-  --primary-gradient: linear-gradient(135deg, #13707f 50%, #1e9fb3 100%);
-  --body: #475569;
-  --glass-bg: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(255, 255, 255, 0.5);
-  --text-main: #1f2937;
-  --text-muted: #596a81;
-  --accent: #F7A423;
-  --text-dark: #0f172a;
-  /* --dark: #0F172A; */
-  --glass-bg: rgba(255, 255, 255, 0.85);
-  --bg-main: #ffffff;
-  --bg-alt: #f8fafc;
-  /* New section background color */
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --glass: rgba(255, 255, 255, 0.85);
-  --glass-border2: rgba(6, 182, 212, 0.2);
-  --radius-xl: 40px;
-  --shadow-fire: 0 30px 60px -12px rgba(6, 182, 212, 0.15);
+  font-family: var(--font-main);
 }
 
 body {
   background-color: var(--bg-body);
-  color: #1e293b;
+  color: var(--text-main);
   overflow-x: hidden;
   letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.main-wrapper {
-  margin-left: 280px;
-  /* match your sidebar width */
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-.app-container {
-  display: flex;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.main-wrapper {
-  flex: 1;
-  min-height: 100vh;
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
 }
 
-.content-padding {
-  padding: 28px;
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Global Helper Classes */
+.card-modern {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  transition: var(--transition);
+}
+
+.card-modern:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-hover);
+}
+
+.glass-morphism {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.badge-soft {
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.badge-primary { background: var(--primary-soft); color: var(--primary); }
+.badge-success { background: var(--success-soft); color: var(--success); }
+.badge-warning { background: var(--accent-soft); color: var(--accent); }
+.badge-danger { background: var(--danger-soft); color: var(--danger); }
+.badge-info { background: var(--info-soft); color: var(--info); }
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--primary) 0%, #14b8a6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Animated Transitions */
+.fade-up-enter-active, .fade-up-leave-active {
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.fade-up-enter-from, .fade-up-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
 }
 
 

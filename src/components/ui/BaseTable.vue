@@ -157,38 +157,89 @@ const changePage = (page) => {
 </script>
 
 <style scoped>
-.page-link {
-  cursor: pointer;
-  box-shadow: none !important;
-}
-.table th {
-  font-weight: 600;
-  color: #495057;
+.table-responsive {
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  overflow: hidden;
 }
 
-.style-header,
-.style-body,
-.style-pagination{
-  font-family: var(--font-khmer) !important;
+.table {
+  margin-bottom: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table th {
+  background: var(--surface-alt);
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table td {
+  padding: 16px 20px;
+  vertical-align: middle;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--border-color);
+  transition: var(--transition);
+}
+
+.table tbody tr {
+  transition: var(--transition);
+}
+
+.table tbody tr:hover {
+  background-color: var(--primary-soft);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Pagination */
+.style-pagination {
+  padding: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.page-link {
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  margin: 0 3px;
+  font-weight: 500;
+  transition: var(--transition);
+  padding: 8px 14px;
+}
+
+.page-item.active .page-link {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  box-shadow: 0 4px 10px rgba(13, 148, 136, 0.2);
+}
+
+.page-link:hover:not(.disabled) {
+  background-color: var(--primary-soft);
+  color: var(--primary);
+  border-color: var(--primary-light);
 }
 
 .skeleton-loader {
   width: 100%;
-  height: 24px;
-  background: linear-gradient(90deg, #e8e8e8 25%, #e6e6e6 50%, #f2f2f2 75%);
+  height: 12px;
+  background: linear-gradient(90deg, var(--surface-alt) 25%, var(--border-color) 50%, var(--surface-alt) 75%);
   background-size: 200% 100%;
   animation: loading-shimmer 1.5s infinite;
-  border-radius: 16px;
-  /* border-radius: 4px; */
-  cursor: progress;
+  border-radius: var(--radius-full);
 }
 
 @keyframes loading-shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 </style>
