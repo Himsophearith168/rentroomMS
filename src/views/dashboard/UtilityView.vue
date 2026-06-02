@@ -165,8 +165,6 @@ const closeModal = () => {
 
 const handleSubmit = async () => {
   submitError.value = null;
-
-  // FIX: client-side guard before hitting the API
   if (!formData.utility_type_id || !formData.unit_price || !formData.effective_from) {
     submitError.value = 'សូមបំពេញព័ត៌មានឱ្យបានគ្រប់គ្រាន់';
     return;
@@ -175,8 +173,6 @@ const handleSubmit = async () => {
     submitError.value = 'តម្លៃក្នុងមួយឯកតាត្រូវតែធំជាង 0';
     return;
   }
-
-  // FIX: build a clean payload with correct types
   const payload = {
     utility_type_id: Number(formData.utility_type_id),
     unit_price: Number(formData.unit_price),

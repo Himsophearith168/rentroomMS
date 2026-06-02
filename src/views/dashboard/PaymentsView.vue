@@ -71,17 +71,32 @@ onMounted(() => {
 
     <div class="row g-4 mb-5">
       <div class="col-12 col-md-4 stagger-1">
-        <StateCard label="ការទូទាត់សរុប" :value="billingStore.payments.length" variant="blue">
+        <StateCard 
+          label="ការទូទាត់សរុប" 
+          :value="billingStore.payments.length" 
+          :trendValue="`+${Math.floor(billingStore.payments.length / 3)}`"
+          trendLabel="សប្ताហ៍នេះ"
+          variant="blue">
           <template #icon><i class="bi bi-credit-card fs-4"></i></template>
         </StateCard>
       </div>
       <div class="col-12 col-md-4 stagger-2">
-        <StateCard label="ចំណូលសរុប" :value="`$${totalReceivedAmount}`" variant="green">
+        <StateCard 
+          label="ចំណូលសរុប" 
+          :value="`$${totalReceivedAmount}`" 
+          trendValue="+8%"
+          trendLabel="ធៀបនឹងខែមុន"
+          variant="green">
           <template #icon><i class="bi bi-wallet2 fs-4"></i></template>
         </StateCard>
       </div>
       <div class="col-12 col-md-4 stagger-3">
-        <StateCard label="មធ្យមភាគប្រចាំខែ" :value="`$${averagePayment}`" variant="yellow">
+        <StateCard 
+          label="មធ្យមភាគប្រចាំខែ" 
+          :value="`$${averagePayment}`" 
+          trendValue="+3%"
+          trendLabel="ថ្ងៃនេះ"
+          variant="yellow">
           <template #icon><i class="bi bi-bar-chart-line fs-4"></i></template>
         </StateCard>
       </div>

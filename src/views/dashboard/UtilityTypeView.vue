@@ -43,6 +43,12 @@
       :title="isEditing ? 'កែប្រែប្រភេទសេវាកម្ម' : 'បន្ថែមប្រភេទសេវាកម្មថ្មី'" 
       @close="closeModal"
     >
+      <!-- Error Message Display -->
+      <div v-if="utilityStore.error" class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ utilityStore.error }}
+        <button type="button" class="btn-close" @click="utilityStore.error = null"></button>
+      </div>
+
       <form @submit.prevent="handleSubmit">
         <div class="row g-4">
           <div class="col-12">
@@ -119,7 +125,10 @@ const closeModal = () => {
 };
 
 const handleSubmit = async () => {
-  if (!formData.utility_name) return;
+  if (!formData.utility_name) {
+    utilityStore.error = 'សូមបំពេញឈ្មោះសេវាកម្ម';
+    return;
+  }
   
   try {
     if (isEditing.value) {
@@ -130,6 +139,7 @@ const handleSubmit = async () => {
     closeModal();
   } catch (err) {
     console.error("Failed to save utility type:", err);
+    utilityStore.error = err?.response?.data?.message || 'មានបញ្ហាក្នុងការរក្សាទុក';
   }
 };
 
@@ -137,6 +147,7 @@ const confirmDelete = async (item) => {
   const id = item.utility_type_id || item.id;
   if (!id) {
     console.error("Utility Type ID is missing", item);
+    utilityStore.error = 'មានបញ្ហាក្នុងការស្វែងរក ID ប្រភេទសេវាកម្ម';
     return;
   }
   
@@ -145,6 +156,7 @@ const confirmDelete = async (item) => {
       await utilityStore.deleteUtilityType(id);
     } catch (err) {
       console.error("Failed to delete utility type:", err);
+      utilityStore.error = err?.response?.data?.message || 'មានបញ្ហាក្នុងការលុប';
     }
   }
 };

@@ -12,17 +12,32 @@
 
     <div class="row g-4 mb-5">
       <div class="col-12 col-md-4 stagger-1">
-        <StateCard label="អ្នកជួលសរុប" :value="rentStore.tenants.length" variant="blue">
+        <StateCard 
+          label="អ្នកជួលសរុប" 
+          :value="rentStore.tenants.length" 
+          trendValue="+5"
+          trendLabel="តាំងពីលើក"
+          variant="blue">
           <template #icon><i class="bi bi-people fs-4"></i></template>
         </StateCard>
       </div>
       <div class="col-12 col-md-4 stagger-2">
-        <StateCard label="អ្នកជួលថ្មីខែនេះ" value="3" variant="green">
+        <StateCard 
+          label="អ្នកជួលថ្មីខែនេះ" 
+          value="3" 
+          trendValue="+3"
+          trendLabel="អ្នកថ្មី"
+          variant="green">
           <template #icon><i class="bi bi-person-check fs-4"></i></template>
         </StateCard>
       </div>
       <div class="col-12 col-md-4 stagger-3">
-        <StateCard label="កិច្ចសន្យាជិតផុតកំណត់" value="2" variant="orange">
+        <StateCard 
+          label="កិច្ចសន្យាជិតផុតកំណត់" 
+          value="2" 
+          trendValue="-1"
+          trendLabel="ផុតកំណត់"
+          variant="orange">
           <template #icon><i class="bi bi-exclamation-triangle fs-4"></i></template>
         </StateCard>
       </div>

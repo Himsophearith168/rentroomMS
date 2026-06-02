@@ -70,7 +70,7 @@ export const useUtilityStore = defineStore("utility", () => {
   const fetchUtilityRates = async () => {
     loading.value = true;
     try {
-      const response = await api.get("/utility");
+      const response = await api.get("/utilityRate");
       utilityRates.value = response.data.data || response.data;
     } catch (err) {
       error.value = "បរាជ័យក្នុងការទាញយកតម្លៃសេវាកម្ម";
@@ -82,7 +82,7 @@ export const useUtilityStore = defineStore("utility", () => {
   const fetchActiveRates = async () => {
     loading.value = true;
     try {
-      const response = await api.get("/utility/active");
+      const response = await api.get("/utilityRate/active");
       activeRates.value = response.data.data || response.data;
     } catch (err) {
       error.value = "បរាជ័យក្នុងការទាញយកតម្លៃសេវាកម្មដែលកំពុងប្រើប្រាស់";
@@ -100,8 +100,8 @@ export const useUtilityStore = defineStore("utility", () => {
         effective_from: data.effective_from,
         is_active: data.is_active ? 1 : 0
       };
-      console.log("[UtilityStore] POST /utility payload:", payload);
-      const response = await api.post("/utility", payload);
+      console.log("[UtilityStore] POST /utilityRate payload:", payload);
+      const response = await api.post("/utilityRate", payload);
       await fetchUtilityRates();
       await fetchActiveRates();
       return response.data;
@@ -122,8 +122,8 @@ export const useUtilityStore = defineStore("utility", () => {
         effective_from: data.effective_from,
         is_active: data.is_active ? 1 : 0
       };
-      console.log(`[UtilityStore] PUT /utility/${id} payload:`, payload);
-      const response = await api.put(`/utility/${id}`, payload);
+      console.log(`[UtilityStore] PUT /utilityRate/${id} payload:`, payload);
+      const response = await api.put(`/utilityRate/${id}`, payload);
       await fetchUtilityRates();
       await fetchActiveRates();
       return response.data;
@@ -138,7 +138,7 @@ export const useUtilityStore = defineStore("utility", () => {
   const deleteUtilityRate = async (id) => {
     loading.value = true;
     try {
-      await api.delete(`/utility/${id}`);
+      await api.delete(`/utilityRate/${id}`);
       await fetchUtilityRates();
       await fetchActiveRates();
     } catch (err) {

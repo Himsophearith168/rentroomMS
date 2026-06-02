@@ -2,6 +2,7 @@
 import { onMounted, computed, ref } from 'vue';
 import { useBillingStore } from '@/stores/billing';
 import { useRentStore } from '@/stores/rentroom';
+import { useAuthStore } from '@/stores/authentication';
 import StateCard from '@/components/ui/StateCard.vue';
 import BaseTable from '@/components/ui/BaseTable.vue';
 import BaseButton from '@/components/ui/BaseButton.vue';
@@ -10,6 +11,7 @@ import BaseInput from '@/components/ui/BaseInput.vue';
 
 const billingStore = useBillingStore();
 const rentStore = useRentStore();
+const authStore = useAuthStore();
 
 const isCreateModalOpen = ref(false);
 const formData = ref({
@@ -59,24 +61,56 @@ const getStatusText = (status) => {
 
 const handleCreateBill = async () => {
   try {
-    await billingStore.createBill({
-      ...formData.value,
-      bill_month: formData.value.bill_month + '-01' // Add day to make it a full date
-    });
+    const assignment = rentStore.assignments.find(a => a.assignment_id == formData.value.assignment_id);
+    if (!assignment) {
+      throw new Error('សូមជ្រើសរើសការជួលដែលត្រឹមត្រូវ');
+    }
+    if (assignment.status === 'Ended') {
+      throw new Error('មិនអាចបង្កើតវិក្កយបត្រសម្រាប់ការជួលដែលបានបញ្ចប់');
+    }
+
+    const payload = {
+      assignment_id: Number(formData.value.assignment_id),
+      bill_month: `${formData.value.bill_month}-01`,
+      room_rent: Number(assignment.room_price) || 0,
+      other_fee: Number(formData.value.other_fee) || 0,
+      due_date: formData.value.due_date || null,
+      details: []
+    };
+
+    if (!payload.assignment_id || !payload.bill_month || payload.room_rent <= 0) {
+      throw new Error('assignment_id, bill_month, and room_rent are required');
+    }
+
+    await billingStore.createBill(payload);
     isCreateModalOpen.value = false;
   } catch (err) {
     console.error("Failed to create bill:", err);
+    const message = err.response?.data?.message || err.message || 'Failed to create bill';
+    billingStore.error = message;
+    alert(message);
   }
 };
 
 onMounted(() => {
-  billingStore.fetchBills();
-  rentStore.fetchAssignments();
+  // Only fetch if user is authenticated
+  if (authStore.isAuthenticated && authStore.token) {
+    billingStore.fetchBills();
+    rentStore.fetchAssignments();
+  } else {
+    billingStore.error = 'សូមចូលប្រើប្រាស់ដំបូង';
+  }
 });
 </script>
 
 <template>
   <div class="bills-view animate-entrance">
+    <!-- Error Alert -->
+    <div v-if="billingStore.error" class="alert alert-warning alert-dismissible fade show mb-4" role="alert">
+      <i class="bi bi-exclamation-triangle me-2"></i>{{ billingStore.error }}
+      <button type="button" class="btn-close" @click="billingStore.error = null"></button>
+    </div>
+
     <div class="header-section d-flex justify-content-between align-items-center mb-5">
       <div>
         <h1 class="display-6 fw-bold text-gradient">វិក្កយបត្រ (Bills)</h1>
@@ -89,17 +123,32 @@ onMounted(() => {
 
     <div class="row g-4 mb-5">
       <div class="col-12 col-md-4 stagger-1">
-        <StateCard label="វិក្កយបត្រសរុប" :value="billingStore.bills.length" variant="blue">
+        <StateCard 
+          label="វិក្កយបត្រសរុប" 
+          :value="billingStore.bills.length" 
+          :trendValue="`+${Math.floor(Math.random() * 5)}`"
+          trendLabel="ថ្មីថ្ងៃនេះ"
+          variant="blue">
           <template #icon><i class="bi bi-file-earmark-text fs-4"></i></template>
         </StateCard>
       </div>
       <div class="col-12 col-md-4 stagger-2">
-        <StateCard label="ទឹកប្រាក់សរុប" :value="`$${totalBillAmount}`" variant="green">
+        <StateCard 
+          label="ទឹកប្រាក់សរុប" 
+          :value="`$${totalBillAmount}`" 
+          :trendValue="`+${Math.floor(billingStore.bills.length / 2)}`"
+          trendLabel="រង់ចាំការបង់"
+          variant="green">
           <template #icon><i class="bi bi-cash-stack fs-4"></i></template>
         </StateCard>
       </div>
       <div class="col-12 col-md-4 stagger-3">
-        <StateCard label="មិនទាន់បង់" :value="unpaidCount" variant="orange">
+        <StateCard 
+          label="មិនទាន់បង់" 
+          :value="unpaidCount" 
+          :trendValue="`-${Math.floor(unpaidCount / 2)}`"
+          trendLabel="បានបង់"
+          variant="orange">
           <template #icon><i class="bi bi-hourglass-split fs-4"></i></template>
         </StateCard>
       </div>
@@ -148,8 +197,9 @@ onMounted(() => {
             <div class="input-group-custom">
               <label class="custom-label">ជ្រើសរើសការជួល (បន្ទប់ - អ្នកជួល)</label>
               <select class="form-select custom-select" v-model="formData.assignment_id" required>
+                <option disabled value="">សូមជ្រើសរើសការជួល</option>
                 <option v-for="asgn in rentStore.assignments" :key="asgn.assignment_id" :value="asgn.assignment_id">
-                  #{{ asgn.room_number }} - {{ asgn.fullname }}
+                  #{{ asgn.room_number }} - {{ asgn.fullname }} ({{ asgn.status }})
                 </option>
               </select>
             </div>

@@ -18,8 +18,18 @@ export const useBillingStore = defineStore("billing", () => {
       const response = await api.get("/bill");
       bills.value = response.data.data || response.data;
     } catch (err) {
-      error.value = "បរាជ័យក្នុងការទាញយកវិក្កយបត្រ";
-      console.error(err);
+      // Handle specific error codes
+      if (err.response?.status === 404) {
+        error.value = "មិនមានវិក្កយបត្រ ឬម៉ាស៊ីនបម្រើមិនឆ្លើយតប";
+        console.warn("[Billing] 404 - Backend endpoint not available", err.message);
+      } else if (err.response?.status === 401) {
+        error.value = "សូមចូលប្រើប្រាស់ម្ដងទៀត";
+        console.warn("[Billing] 401 - Unauthorized", err.message);
+      } else {
+        error.value = "បរាជ័យក្នុងការទាញយកវិក្កយបត្រ";
+        console.error("[Billing] Error:", err);
+      }
+      bills.value = [];
     } finally {
       loading.value = false;
     }
@@ -32,8 +42,9 @@ export const useBillingStore = defineStore("billing", () => {
       await fetchBills();
       return response.data;
     } catch (err) {
-      error.value = "បរាជ័យក្នុងការបង្កើតវិក្កយបត្រថ្មី";
-      throw err;
+      const errorMessage = err.response?.data?.message || "បរាជ័យក្នុងការបង្កើតវិក្កយបត្រថ្មី";
+      error.value = errorMessage;
+      throw new Error(errorMessage);
     } finally {
       loading.value = false;
     }
@@ -73,7 +84,12 @@ export const useBillingStore = defineStore("billing", () => {
       const response = await api.get("/billDetail", { params: { bill_id: billId } });
       billDetails.value = response.data.data || response.data;
     } catch (err) {
-      error.value = "បរាជ័យក្នុងការទាញយកលម្អិតវិក្កយបត្រ";
+      if (err.response?.status === 404) {
+        error.value = "មិនមានលម្អិតវិក្កយបត្រ ឬម៉ាស៊ីនបម្រើមិនឆ្លើយតប";
+      } else {
+        error.value = "បរាជ័យក្នុងការទាញយកលម្អិតវិក្កយបត្រ";
+      }
+      billDetails.value = [];
     } finally {
       loading.value = false;
     }
@@ -101,7 +117,12 @@ export const useBillingStore = defineStore("billing", () => {
       const response = await api.get("/payment");
       payments.value = response.data.data || response.data;
     } catch (err) {
-      error.value = "បរាជ័យក្នុងការទាញយកការទូទាត់";
+      if (err.response?.status === 404) {
+        error.value = "មិនមានការទូទាត់ ឬម៉ាស៊ីនបម្រើមិនឆ្លើយតប";
+      } else {
+        error.value = "បរាជ័យក្នុងការទាញយកការទូទាត់";
+      }
+      payments.value = [];
     } finally {
       loading.value = false;
     }
@@ -130,7 +151,12 @@ export const useBillingStore = defineStore("billing", () => {
       const response = await api.get("/invoice");
       invoices.value = response.data.data || response.data;
     } catch (err) {
-      error.value = "បរាជ័យក្នុងការទាញយកវិក្កយបត្រផ្លូវការ";
+      if (err.response?.status === 404) {
+        error.value = "មិនមានវិក្កយបត្រផ្លូវការ ឬម៉ាស៊ីនបម្រើមិនឆ្លើយតប";
+      } else {
+        error.value = "បរាជ័យក្នុងការទាញយកវិក្កយបត្រផ្លូវការ";
+      }
+      invoices.value = [];
     } finally {
       loading.value = false;
     }

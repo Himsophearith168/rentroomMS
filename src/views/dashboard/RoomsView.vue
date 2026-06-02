@@ -12,22 +12,42 @@
 
     <div class="row g-4 mb-5">
       <div class="col-12 col-md-3 stagger-1">
-        <StateCard label="បន្ទប់សរុប" :value="roomCount" variant="blue">
+        <StateCard 
+          label="បន្ទប់សរុប" 
+          :value="roomCount" 
+          trendValue="+2"
+          trendLabel="បន្ទប់ថ្មី"
+          variant="blue">
           <template #icon><i class="bi bi-house-door fs-4"></i></template>
         </StateCard>
       </div>
       <div class="col-12 col-md-3 stagger-2">
-        <StateCard label="បន្ទប់មានអ្នកជួល" :value="occupiedRooms" variant="green">
+        <StateCard 
+          label="បន្ទប់មានអ្នកជួល" 
+          :value="occupiedRooms" 
+          trendValue="+1"
+          trendLabel="សប្ताហ៍នេះ"
+          variant="green">
           <template #icon><i class="bi bi-house-check fs-4"></i></template>
         </StateCard>
       </div>
       <div class="col-12 col-md-3 stagger-3">
-        <StateCard label="បន្ទប់ទំនេរ" :value="availableRooms" variant="yellow">
+        <StateCard 
+          label="បន្ទប់ទំនេរ" 
+          :value="availableRooms" 
+          :trendValue="`-${occupiedRooms - availableRooms}`"
+          trendLabel="ម្សិលមិញ"
+          variant="yellow">
           <template #icon><i class="bi bi-house-exclamation fs-4"></i></template>
         </StateCard>
       </div>
       <div class="col-12 col-md-3 stagger-4">
-        <StateCard label="ចំណូលរំពឹងទុក" :value="`$${totalPotentialRevenue}`" variant="orange">
+        <StateCard 
+          label="ចំណូលរំពឹងទុក" 
+          :value="`$${totalPotentialRevenue}`" 
+          trendValue="+5%"
+          trendLabel="ប្រឹងប្រែង"
+          variant="orange">
           <template #icon><i class="bi bi-currency-dollar fs-4"></i></template>
         </StateCard>
       </div>
