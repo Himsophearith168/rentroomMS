@@ -34,6 +34,8 @@ const isCreateModalOpen = ref(false);
 
 const toggleCreateModal = () => (isCreateModalOpen.value = !isCreateModalOpen.value);
 
+// Note: If your composable `useSidebar()` is handling the state globally, 
+// you can safely remove this provide/inject block for the sidebar.
 provide("sidebar", {
   isSidebarOpen,
   toggleSidebar: () => (isSidebarOpen.value = !isSidebarOpen.value),
@@ -101,32 +103,45 @@ const onTaskUpdated = (task) => {
   display: flex;
   min-height: 100vh;
   width: 100%;
-  background-color: var(--bg-body);
+  background-color: var(--bg-body, #f8fafc);
 }
 
 /* Desktop layout */
 .main-wrapper {
-  margin-left: var(--sidebar-width);
-  width: calc(100% - var(--sidebar-width));
+  margin-left: 280px; /* Matches the fixed sidebar width */
+  flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
 
-/* Content spacing */
+/* Content spacing - Push down for fixed Navbar & add side padding */
 .content-padding {
   flex: 1;
-  padding: var(--content-padding);
+  padding: 28px;
+  /* Top padding = Navbar height (65px) + desired spacing gap (28px) */
+  padding-top: 93px; 
 }
 
 /* ================= MOBILE ================= */
 @media (max-width: 900px) {
   .main-wrapper {
-    margin-left: 0;
+    margin-left: 0; /* Sidebar is off-screen, so take full width */
     width: 100%;
   }
 
   .content-padding {
     padding: 20px;
+    /* Top padding = Mobile Navbar height (60px) + desired spacing gap (20px) */
+    padding-top: 80px; 
+  }
+}
+
+@media (max-width: 575px) {
+  .content-padding {
+    padding: 16px;
+    /* Top padding = Small Mobile Navbar height (56px) + desired spacing gap (16px) */
+    padding-top: 72px; 
   }
 }
 </style>

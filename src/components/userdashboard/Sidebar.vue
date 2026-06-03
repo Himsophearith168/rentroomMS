@@ -245,24 +245,70 @@ const handleLogout = async () => {
   top: 0;
   left: 0;
   bottom: 0;
-  width: var(--sidebar-width);
+  width: var(--sidebar-width, 280px); /* Added fallback width */
   height: 100vh;
   padding: 32px 20px;
   display: flex;
   flex-direction: column;
-  background: var(--bg-sidebar);
-  border-right: 1px solid var(--border-color);
+  background: var(--bg-sidebar, #ffffff);
+  border-right: 1px solid var(--border-color, #e2e8f0);
   z-index: 1100;
-  transition: var(--transition);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth slide animation */
   overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Overlay ──────────────────────────────────────────────────────── */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1050; /* Below sidebar, above content */
+  transition: opacity 0.3s ease;
+}
+
+.overlay-fade-enter-active,
+.overlay-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.overlay-fade-enter-from,
+.overlay-fade-leave-to {
+  opacity: 0;
+}
+
+/* Desktop ────────────────────────────────────────────────────────── */
+@media (min-width: 901px) {
+  #reab-sidebar {
+    transform: translateX(0); /* Always visible */
+  }
+  /* Hide overlay on desktop since sidebar is always open */
+  .sidebar-overlay {
+    display: none !important; 
+  }
+}
+
+/* Mobile ≤ 900px ───────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  #reab-sidebar {
+    transform: translateX(-100%); /* Hidden off-screen by default */
+    z-index: 1200; /* Ensure it sits above the overlay and navbar */
+  }
+  #reab-sidebar.open {
+    transform: translateX(0); /* Slide in when open */
+  }
 }
 
 /* Brand ─────────────────────────────────────────────────────────── */
+.logo-sticky {
+  margin-bottom: 10px;
+}
+
 .logo-section {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
   padding: 0 12px;
 }
 
@@ -276,15 +322,15 @@ const handleLogout = async () => {
 .brand-logo {
   width: 42px;
   height: 42px;
-  background: linear-gradient(135deg, var(--primary), #14b8a6);
-  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--primary, #0d9488), #14b8a6);
+  border-radius: var(--radius-md, 12px);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-size: 1.5rem;
   box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
-  transition: var(--transition);
+  transition: var(--transition, all 0.2s ease);
 }
 
 .brand-area:hover .brand-logo {
@@ -294,12 +340,12 @@ const handleLogout = async () => {
 .brand-name {
   font-weight: 800;
   font-size: 1.25rem;
-  color: var(--text-main);
+  color: var(--text-main, #1e293b);
   letter-spacing: -0.02em;
 }
 
 .brand-color {
-  color: var(--primary);
+  color: var(--primary, #0d9488);
 }
 
 /* Nav ───────────────────────────────────────────────────────────── */
@@ -309,7 +355,7 @@ const handleLogout = async () => {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--text-light);
+  color: var(--text-light, #94a3b8);
 }
 
 .reab-nav-link {
@@ -321,9 +367,9 @@ const handleLogout = async () => {
   font-size: 0.9375rem;
   font-weight: 600;
   text-decoration: none;
-  color: var(--text-muted);
-  border-radius: var(--radius-md);
-  transition: var(--transition);
+  color: var(--text-muted, #64748b);
+  border-radius: var(--radius-md, 12px);
+  transition: var(--transition, all 0.2s ease);
 }
 
 .reab-nav-link i {
@@ -333,13 +379,13 @@ const handleLogout = async () => {
 }
 
 .reab-nav-link:hover {
-  background: var(--primary-soft);
-  color: var(--primary);
+  background: var(--primary-soft, #f0fdfa);
+  color: var(--primary, #0d9488);
   transform: translateX(4px);
 }
 
 .reab-nav-link.active {
-  background: var(--primary);
+  background: var(--primary, #0d9488);
   color: white;
   box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
 }
@@ -360,15 +406,15 @@ const handleLogout = async () => {
   font-weight: 700;
   cursor: pointer;
   background: transparent;
-  border: 1.5px solid var(--danger-soft);
-  border-radius: var(--radius-md);
-  color: var(--danger);
-  transition: var(--transition);
+  border: 1.5px solid var(--danger-soft, #fee2e2);
+  border-radius: var(--radius-md, 12px);
+  color: var(--danger, #ef4444);
+  transition: var(--transition, all 0.2s ease);
 }
 
 .btn-logout:hover {
-  background: var(--danger-soft);
-  border-color: var(--danger);
+  background: var(--danger-soft, #fee2e2);
+  border-color: var(--danger, #ef4444);
 }
 
 /* Logout modal ──────────────────────────────────────────────────── */

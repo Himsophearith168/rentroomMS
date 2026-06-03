@@ -84,9 +84,9 @@ import { useRouter } from "vue-router";
 import { useNoteStore } from "@/stores/note.js";
 import { useSidebar } from "@/composable/Usesidebar";
 import { Search, Moon, X } from "lucide-vue-next";
+
 const router = useRouter();
 const noteStore = useNoteStore();
-
 const { isSidebarOpen, toggleSidebar } = useSidebar();
 
 const q = ref("");
@@ -146,17 +146,27 @@ watch(q, (val) => {
 
 .reab-navbar {
   font-family: "Inter", sans-serif;
+  position: fixed; /* Changed to fixed for better layout control */
+  top: 0;
+  left: 0;
+  right: 0;
   height: 65px;
   background: #ffffff;
   border-bottom: 1px solid #f1f5f9;
   padding: 0 28px;
   display: flex;
   align-items: center;
-  position: sticky;
-  top: 0;
   width: 100%;
   z-index: 900;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth transition when sidebar toggles */
+}
+
+/* Desktop: Push navbar to the right of the sidebar */
+@media (min-width: 901px) {
+  .reab-navbar {
+    left: var(--sidebar-width, 280px); /* Match sidebar width */
+  }
 }
 
 .navbar-container {
@@ -373,6 +383,7 @@ watch(q, (val) => {
     padding: 0 16px;
     height: 60px;
     z-index: 950;
+    left: 0; /* Take full width on mobile */
   }
   .navbar-container {
     gap: 10px;

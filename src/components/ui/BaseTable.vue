@@ -1,5 +1,5 @@
 <template>
-  <div class="table-responsive">
+  <div class="custom-table-wrapper">
     <table class="table table-striped table-hover align-middle">
       <thead class="style-header table-light">
         <tr>
@@ -10,7 +10,7 @@
       </thead>
       <tbody class="style-body">
         <template v-if="loading">
-          <tr v-for="n in 5" :key="'loading-' + n">
+          <tr v-for="n in 5" :key="'loading-' + n" class="skeleton-row">
             <td v-for="field in fields" :key="'loading-td-' + field.key">
               <div class="skeleton-loader"></div>
             </td>
@@ -19,16 +19,25 @@
 
         <template v-else>
           <tr v-for="(item, index) in items" :key="item.id || index">
-            <td v-for="field in fields" :key="field.key" :class="field.tdClass">
+            <!-- Added :data-label for mobile card view -->
+            <td 
+              v-for="field in fields" 
+              :key="field.key" 
+              :class="field.tdClass" 
+              :data-label="!loading ? field.label : ''"
+            >
               <slot :name="`cell(${field.key})`" :item="item">
                 {{ item[field.key] }}
               </slot>
             </td>
           </tr>
           
-          <tr v-if="items.length === 0">
-            <td :colspan="fields.length" class="text-center text-muted py-4">
-              មិនមានទិន្នន័យបង្ហាញឡើយ។
+          <tr v-if="items.length === 0" class="empty-row">
+            <td :colspan="fields.length" class="text-center text-muted py-5">
+              <div class="empty-state-content">
+                <i class="bi bi-inbox fs-1 d-block mb-2 opacity-25"></i>
+                មិនមានទិន្នន័យបង្ហាញឡើយ។
+              </div>
             </td>
           </tr>
         </template>
@@ -38,12 +47,15 @@
     <nav
       v-if="totalRows > perPage"
       aria-label="Page navigation"
-      class="style-pagination d-flex justify-content-between align-items-center mt-3"
+      class="style-pagination d-flex flex-column flex-md-row justify-content-md-between align-items-center"
     >
-      <span class="text-muted small">
+      <!-- Stacks vertically on mobile, horizontal on desktop -->
+      <span class="text-muted small text-center text-md-start mb-3 mb-md-0">
         បង្ហាញ {{ startRow }} ដល់ {{ endRow }} នៃទិន្នន័យសរុប {{ totalRows }}
       </span>
-      <ul :class="['pagination pagination-md mb-0 d-flex justify-content-center align-items-center cursor-not-allowed']">
+      
+      <!-- Smaller pagination on mobile, wraps if needed -->
+      <ul :class="['pagination pagination-sm mb-0 d-flex justify-content-center align-items-center flex-wrap gap-1']">
         <li class="page-item" :class="{ disabled: currentPage === 1 }">
           <button
             class="page-link"
@@ -142,7 +154,7 @@ const displayedPages = computed(() => {
     pages.push("...");
   }
 
-    pages.push(total);
+  pages.push(total);
 
   return pages;
 });
@@ -157,10 +169,11 @@ const changePage = (page) => {
 </script>
 
 <style scoped>
-.table-responsive {
-  border-radius: var(--radius-lg);
-  background: var(--bg-card);
+.custom-table-wrapper {
+  border-radius: var(--radius-lg, 16px);
+  background: var(--bg-card, #ffffff);
   overflow: hidden;
+  border: 1px solid var(--border-color, #e2e8f0);
 }
 
 .table {
@@ -170,30 +183,31 @@ const changePage = (page) => {
 }
 
 .table th {
-  background: var(--surface-alt);
+  background: var(--surface-alt, #f8fafc);
   font-weight: 600;
   font-size: 0.875rem;
-  color: var(--text-muted);
+  color: var(--text-muted, #64748b);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  white-space: nowrap;
 }
 
 .table td {
   padding: 16px 20px;
   vertical-align: middle;
-  color: var(--text-main);
-  border-bottom: 1px solid var(--border-color);
-  transition: var(--transition);
+  color: var(--text-main, #1e293b);
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  transition: var(--transition, all 0.15s ease);
 }
 
 .table tbody tr {
-  transition: var(--transition);
+  transition: var(--transition, all 0.15s ease);
 }
 
 .table tbody tr:hover {
-  background-color: var(--primary-soft);
+  background-color: var(--primary-soft, #f0fdfa);
 }
 
 .table tbody tr:last-child td {
@@ -203,43 +217,138 @@ const changePage = (page) => {
 /* Pagination */
 .style-pagination {
   padding: 20px;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--border-color, #e2e8f0);
 }
 
 .page-link {
-  border: 1px solid var(--border-color);
-  color: var(--text-muted);
-  border-radius: var(--radius-sm);
-  margin: 0 3px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  color: var(--text-muted, #64748b);
+  border-radius: var(--radius-sm, 8px);
+  margin: 0 2px;
   font-weight: 500;
-  transition: var(--transition);
+  transition: var(--transition, all 0.15s ease);
   padding: 8px 14px;
 }
 
 .page-item.active .page-link {
-  background-color: var(--primary);
-  border-color: var(--primary);
+  background-color: var(--primary, #0d9488);
+  border-color: var(--primary, #0d9488);
   color: white;
   box-shadow: 0 4px 10px rgba(13, 148, 136, 0.2);
 }
 
 .page-link:hover:not(.disabled) {
-  background-color: var(--primary-soft);
-  color: var(--primary);
-  border-color: var(--primary-light);
+  background-color: var(--primary-soft, #f0fdfa);
+  color: var(--primary, #0d9488);
+  border-color: var(--primary, #0d9488);
 }
 
+/* Skeleton Loader */
 .skeleton-loader {
-  width: 100%;
+  width: 80%;
   height: 12px;
-  background: linear-gradient(90deg, var(--surface-alt) 25%, var(--border-color) 50%, var(--surface-alt) 75%);
+  background: linear-gradient(90deg, var(--surface-alt, #f1f5f9) 25%, var(--border-color, #e2e8f0) 50%, var(--surface-alt, #f1f5f9) 75%);
   background-size: 200% 100%;
   animation: loading-shimmer 1.5s infinite;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-full, 50px);
 }
 
 @keyframes loading-shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+/* ==========================================
+   📱 RESPONSIVE MOBILE CARD VIEW
+   ========================================== */
+@media (max-width: 768px) {
+  .custom-table-wrapper {
+    background: transparent;
+    border: none;
+    overflow-x: hidden;
+  }
+
+  .table {
+    background: transparent;
+  }
+
+  /* Hide table headers on mobile */
+  .table thead {
+    display: none;
+  }
+
+  .table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 0;
+  }
+
+  /* Make each row look like a card */
+  .table tbody tr {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: var(--radius-lg, 16px);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Reset Bootstrap striped/hover for cards */
+  .table tbody tr:nth-of-type(odd),
+  .table tbody tr:hover {
+    background-color: var(--bg-card, #ffffff);
+  }
+
+  /* Make cells flex rows: label on left, value on right */
+  .table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: right;
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+    padding: 12px 20px;
+  }
+
+  /* Generate the label from data-label attribute */
+  .table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    color: var(--text-muted, #94a3b8);
+    margin-right: 16px;
+    text-align: left;
+  }
+
+  .table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Hide labels for skeleton loaders on mobile */
+  .skeleton-row td::before {
+    content: none;
+  }
+  
+  .skeleton-row .skeleton-loader {
+    width: 100%;
+  }
+
+  /* Special styling for empty state on mobile */
+  .empty-row {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+  }
+  .empty-row td {
+    display: block;
+    text-align: center;
+    border-bottom: none;
+  }
+  .empty-row td::before {
+    content: none;
+  }
 }
 </style>
