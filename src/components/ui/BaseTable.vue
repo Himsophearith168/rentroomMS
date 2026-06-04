@@ -19,7 +19,6 @@
 
         <template v-else>
           <tr v-for="(item, index) in items" :key="item.id || index">
-            <!-- Added :data-label for mobile card view -->
             <td 
               v-for="field in fields" 
               :key="field.key" 
@@ -214,7 +213,6 @@ const changePage = (page) => {
   border-bottom: none;
 }
 
-/* Pagination */
 .style-pagination {
   padding: 20px;
   border-top: 1px solid var(--border-color, #e2e8f0);
@@ -243,7 +241,6 @@ const changePage = (page) => {
   border-color: var(--primary, #0d9488);
 }
 
-/* Skeleton Loader */
 .skeleton-loader {
   width: 80%;
   height: 12px;
@@ -258,9 +255,7 @@ const changePage = (page) => {
   100% { background-position: -200% 0; }
 }
 
-/* ==========================================
-   📱 RESPONSIVE MOBILE CARD VIEW
-   ========================================== */
+
 @media (max-width: 768px) {
   .custom-table-wrapper {
     background: transparent;
@@ -272,7 +267,6 @@ const changePage = (page) => {
     background: transparent;
   }
 
-  /* Hide table headers on mobile */
   .table thead {
     display: none;
   }
@@ -284,7 +278,6 @@ const changePage = (page) => {
     padding: 0;
   }
 
-  /* Make each row look like a card */
   .table tbody tr {
     display: flex;
     flex-direction: column;
@@ -295,13 +288,11 @@ const changePage = (page) => {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   }
 
-  /* Reset Bootstrap striped/hover for cards */
   .table tbody tr:nth-of-type(odd),
   .table tbody tr:hover {
     background-color: var(--bg-card, #ffffff);
   }
 
-  /* Make cells flex rows: label on left, value on right */
   .table td {
     display: flex;
     justify-content: space-between;
@@ -311,7 +302,6 @@ const changePage = (page) => {
     padding: 12px 20px;
   }
 
-  /* Generate the label from data-label attribute */
   .table td::before {
     content: attr(data-label);
     font-weight: 600;
@@ -327,7 +317,6 @@ const changePage = (page) => {
     border-bottom: none;
   }
 
-  /* Hide labels for skeleton loaders on mobile */
   .skeleton-row td::before {
     content: none;
   }
