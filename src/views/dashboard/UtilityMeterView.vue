@@ -5,9 +5,14 @@
         <h1 class="display-6 fw-bold text-gradient">ការវាស់ស្ទង់ម៉ែត្រ</h1>
         <p class="text-muted">បញ្ចូលលេខម៉ែត្រ (ភ្លើង, ទឹក) សម្រាប់បន្ទប់នីមួយៗ</p>
       </div>
-      <BaseButton variant="primary" @click="isCreateModalOpen = true">
-        <i class="bi bi-plus-lg me-2"></i>កត់ត្រាលេខម៉ែត្រថ្មី
-      </BaseButton>
+      <div class="d-flex gap-2">
+        <BaseButton variant="outline" @click="handlePrint">
+          <i class="bi bi-printer me-2"></i>បោះពុម្ព
+        </BaseButton>
+        <BaseButton variant="primary" @click="isCreateModalOpen = true">
+          <i class="bi bi-plus-lg me-2"></i>កត់ត្រាលេខម៉ែត្រថ្មី
+        </BaseButton>
+      </div>
     </div>
 
     <div class="card-modern overflow-hidden">
@@ -83,6 +88,15 @@
         <BaseButton variant="primary" @click="handleSubmit" :loading="utilityStore.loading" fullWidth>រក្សាទុក</BaseButton>
       </template>
     </BaseModal>
+
+    <!-- Delete Confirmation Modal -->
+    <DeleteConfirmModal
+      :show="showDeleteModal"
+      :loading="utilityStore.loading"
+      :message="`តើអ្នកពិតជាចង់លុបការវាស់ស្ទង់សម្រាប់បន្ទប់ #${selectedReading?.room_number} នេះមែនទេ?`"
+      @close="showDeleteModal = false"
+      @confirm="handleDelete"
+    />
   </div>
 </template>
 
@@ -94,11 +108,14 @@ import BaseTable from '@/components/ui/BaseTable.vue';
 import BaseButton from '@/components/ui/BaseButton.vue';
 import BaseModal from '@/components/ui/BaseModal.vue';
 import BaseInput from '@/components/ui/BaseInput.vue';
+import DeleteConfirmModal from '@/components/ui/DeleteConfirmModal.vue';
 
 const utilityStore = useUtilityStore();
 const rentStore = useRentStore();
 
 const isCreateModalOpen = ref(false);
+const showDeleteModal = ref(false);
+const selectedReading = ref(null);
 const isEditing = ref(false);
 const editingId = ref(null);
 
@@ -160,20 +177,23 @@ const handleSubmit = async () => {
   }
 };
 
-const confirmDelete = async (item) => {
-  const id = item.reading_id || item.id;
-  if (!id) {
-    console.error("Meter Reading ID is missing", item);
-    return;
+const confirmDelete = (item) => {
+  selectedReading.value = item;
+  showDeleteModal.value = true;
+};
+
+const handleDelete = async () => {
+  const id = selectedReading.value.reading_id || selectedReading.value.id;
+  try {
+    await utilityStore.deleteMeterReading(id);
+    showDeleteModal.value = false;
+  } catch (err) {
+    console.error("Failed to delete meter reading:", err);
   }
-  
-  if (confirm(`តើអ្នកពិតជាចង់លុបការវាស់ស្ទង់នេះមែនទេ?`)) {
-    try {
-      await utilityStore.deleteMeterReading(id);
-    } catch (err) {
-      console.error("Failed to delete meter reading:", err);
-    }
-  }
+};
+
+const handlePrint = () => {
+  window.print();
 };
 
 onMounted(() => {
@@ -240,5 +260,14 @@ onMounted(() => {
   border-color: #0d9488;
   box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
   outline: none;
+}
+
+@media print {
+  .header-section button, 
+  .action-btn,
+  .sidebar,
+  .navbar {
+    display: none !important;
+  }
 }
 </style>

@@ -74,36 +74,84 @@
         <template #cell(room_number)="{ item }">
           <span class="fw-semibold">#{{ item.room_number }}</span>
         </template>
-        <template #cell(actions)>
+        <template #cell(actions)="{ item }">
           <div class="d-flex gap-2">
-            <button class="action-btn edit" title="កែប្រែ"><i class="bi bi-pencil-square"></i></button>
-            <button class="action-btn delete" title="លុប"><i class="bi bi-trash3"></i></button>
+            <button class="action-btn view" title="មើលលម្អិត" @click="viewRoom(item)">
+              <i class="bi bi-eye"></i>
+            </button>
+            <button class="action-btn edit" title="កែប្រែ">
+              <i class="bi bi-pencil-square"></i>
+            </button>
+            <button class="action-btn delete" title="លុប" @click="confirmDelete(item)">
+              <i class="bi bi-trash3"></i>
+            </button>
           </div>
         </template>
       </BaseTable>
     </div>
+
+    <!-- Room Detail Modal -->
+    <RoomDetailModal 
+      :show="showDetailModal" 
+      :room="selectedRoom" 
+      @close="showDetailModal = false"
+    />
+
+    <!-- Delete Confirmation Modal -->
+    <DeleteConfirmModal
+      :show="showDeleteModal"
+      :loading="rentStore.loading"
+      :message="`តើអ្នកពិតជាចង់លុបបន្ទប់ #${selectedRoom?.room_number} នេះមែនទេ?`"
+      @close="showDeleteModal = false"
+      @confirm="handleDelete"
+    />
   </div>
 </template>
 
 <script setup>
-import { onMounted, computed, inject } from 'vue';
+import { onMounted, computed, inject, ref } from 'vue';
 import { useRentStore } from '@/stores/rentroom';
 import StateCard from '@/components/ui/StateCard.vue';
 import BaseTable from '@/components/ui/BaseTable.vue';
 import BaseButton from '@/components/ui/BaseButton.vue';
+import RoomDetailModal from '@/components/ui/RoomDetailModal.vue';
+import DeleteConfirmModal from '@/components/ui/DeleteConfirmModal.vue';
 
 const rentStore = useRentStore();
 const { toggleCreateModal } = inject("modals");
 
+const showDetailModal = ref(false);
+const showDeleteModal = ref(false);
+const selectedRoom = ref(null);
+
 const roomCount = computed(() => rentStore.rooms.length);
-const availableRooms = computed(() => rentStore.rooms.filter(r => r.status === 'Available').length);
-const occupiedRooms = computed(() => rentStore.rooms.filter(r => r.status !== 'Available').length);
+const availableRooms = computed(() => rentStore.rooms.filter(r => r.status === 'Available' || r.status === 'ទំនេរ').length);
+const occupiedRooms = computed(() => rentStore.rooms.filter(r => r.status !== 'Available' && r.status !== 'ទំនេរ').length);
 const totalPotentialRevenue = computed(() => {
   return rentStore.rooms.reduce((acc, room) => acc + (parseFloat(room.room_price) || 0), 0).toLocaleString();
 });
 
 const openCreateModal = () => {
   toggleCreateModal();
+};
+
+const viewRoom = (room) => {
+  selectedRoom.value = room;
+  showDetailModal.value = true;
+};
+
+const confirmDelete = (room) => {
+  selectedRoom.value = room;
+  showDeleteModal.value = true;
+};
+
+const handleDelete = async () => {
+  try {
+    await rentStore.deleteRoom(selectedRoom.value.id);
+    showDeleteModal.value = false;
+  } catch (err) {
+    alert('បរាជ័យក្នុងការលុបបន្ទប់');
+  }
 };
 
 const tableFields = [
@@ -117,6 +165,7 @@ const tableFields = [
 
 onMounted(() => {
   rentStore.fetchRooms();
+  rentStore.fetchAssignments(); // Needed for RoomDetailModal to show current tenant
 });
 </script>
 
@@ -137,6 +186,12 @@ onMounted(() => {
   background: white;
   transition: var(--transition);
   cursor: pointer;
+}
+
+.action-btn.view:hover {
+  background: var(--primary-soft);
+  color: var(--primary);
+  border-color: var(--primary);
 }
 
 .action-btn.edit:hover {

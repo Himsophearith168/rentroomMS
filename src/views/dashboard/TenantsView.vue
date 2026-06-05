@@ -5,9 +5,14 @@
         <h1 class="display-6 fw-bold text-gradient">បញ្ជីឈ្មោះអ្នកជួលទាំងអស់</h1>
         <p class="text-muted">គ្រប់គ្រងព័ត៌មាន និងទំនាក់ទំនងរបស់អ្នកជួល</p>
       </div>
-      <BaseButton variant="primary" @click="isCreateModalOpen = true">
-        <i class="bi bi-person-plus me-2"></i>បន្ថែមអ្នកជួល
-      </BaseButton>
+      <div class="d-flex gap-2">
+        <BaseButton variant="outline" @click="handlePrint">
+          <i class="bi bi-printer me-2"></i>បោះពុម្ព
+        </BaseButton>
+        <BaseButton variant="primary" @click="isCreateModalOpen = true">
+          <i class="bi bi-person-plus me-2"></i>បន្ថែមអ្នកជួល
+        </BaseButton>
+      </div>
     </div>
 
     <div class="row g-4 mb-5">
@@ -70,6 +75,9 @@
             </button>
             <button class="action-btn view" title="មើលព័ត៌មាន"><i class="bi bi-eye"></i></button>
             <button class="action-btn edit" title="កែប្រែ"><i class="bi bi-pencil-square"></i></button>
+            <button class="action-btn delete" title="លុប" @click="confirmDelete(item)">
+              <i class="bi bi-trash3"></i>
+            </button>
           </div>
         </template>
       </BaseTable>
@@ -87,6 +95,15 @@
       @close="isAssignModalOpen = false"
       @submit="rentStore.fetchTenants"
     />
+
+    <!-- Delete Confirmation Modal -->
+    <DeleteConfirmModal
+      :show="showDeleteModal"
+      :loading="rentStore.loading"
+      :message="`តើអ្នកពិតជាចង់លុបអ្នកជួល '${selectedTenant?.fullname}' នេះមែនទេ?`"
+      @close="showDeleteModal = false"
+      @confirm="handleDelete"
+    />
   </div>
 </template>
 
@@ -98,15 +115,35 @@ import BaseTable from '@/components/ui/BaseTable.vue';
 import BaseButton from '@/components/ui/BaseButton.vue';
 import CreateTenantModal from '@/components/ui/CreateTenantModal.vue';
 import CreateRoomAssignModal from '@/components/ui/CreateRoomAssignModal.vue';
+import DeleteConfirmModal from '@/components/ui/DeleteConfirmModal.vue';
 
 const rentStore = useRentStore();
 const isCreateModalOpen = ref(false);
 const isAssignModalOpen = ref(false);
+const showDeleteModal = ref(false);
 const selectedTenant = ref(null);
 
 const openAssignModal = (tenant) => {
   selectedTenant.value = tenant;
   isAssignModalOpen.value = true;
+};
+
+const confirmDelete = (tenant) => {
+  selectedTenant.value = tenant;
+  showDeleteModal.value = true;
+};
+
+const handleDelete = async () => {
+  try {
+    await rentStore.deleteTenant(selectedTenant.value.id);
+    showDeleteModal.value = false;
+  } catch (err) {
+    alert('បរាជ័យក្នុងការលុប');
+  }
+};
+
+const handlePrint = () => {
+  window.print();
 };
 
 const tableFields = [
@@ -164,5 +201,20 @@ onMounted(() => {
   background: var(--info-soft);
   color: var(--info);
   border-color: var(--info);
+}
+
+.action-btn.delete:hover {
+  background: var(--danger-soft);
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+@media print {
+  .header-section button, 
+  .action-btn,
+  .sidebar,
+  .navbar {
+    display: none !important;
+  }
 }
 </style>

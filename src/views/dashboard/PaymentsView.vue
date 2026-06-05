@@ -6,10 +6,13 @@ import BaseTable from '@/components/ui/BaseTable.vue';
 import BaseButton from '@/components/ui/BaseButton.vue';
 import BaseModal from '@/components/ui/BaseModal.vue';
 import BaseInput from '@/components/ui/BaseInput.vue';
+import DeleteConfirmModal from '@/components/ui/DeleteConfirmModal.vue';
 
 const billingStore = useBillingStore();
 
 const isCreateModalOpen = ref(false);
+const showDeleteModal = ref(false);
+const selectedPayment = ref(null);
 const formData = ref({
   bill_id: '',
   amount: 0,
@@ -46,6 +49,24 @@ const handleCreatePayment = async () => {
   }
 };
 
+const confirmDelete = (payment) => {
+  selectedPayment.value = payment;
+  showDeleteModal.value = true;
+};
+
+const handleDelete = async () => {
+  try {
+    await billingStore.deletePayment(selectedPayment.value.payment_id || selectedPayment.value.id);
+    showDeleteModal.value = false;
+  } catch (err) {
+    alert('បរាជ័យក្នុងការលុប');
+  }
+};
+
+const handlePrint = () => {
+  window.print();
+};
+
 onMounted(() => {
   billingStore.fetchPayments();
   billingStore.fetchBills(); // To select bill in modal
@@ -60,8 +81,8 @@ onMounted(() => {
         <p class="text-muted">ពិនិត្យមើលប្រវត្តិនៃការបង់ប្រាក់របស់អ្នកជួល</p>
       </div>
       <div class="d-flex gap-2">
-        <BaseButton variant="outline" size="sm">
-          <i class="bi bi-download me-2"></i>ទាញយករបាយការណ៍
+        <BaseButton variant="outline" size="sm" @click="handlePrint">
+          <i class="bi bi-printer me-2"></i>បោះពុម្ពរបាយការណ៍
         </BaseButton>
         <BaseButton variant="primary" size="sm" @click="isCreateModalOpen = true">
           <i class="bi bi-plus-circle me-2"></i>បន្ថែមការទូទាត់
@@ -127,9 +148,10 @@ onMounted(() => {
         <template #cell(bill_id)="{ item }">
           <span class="fw-semibold">#{{ item.bill_id }}</span>
         </template>
-        <template #cell(actions)>
+        <template #cell(actions)="{ item }">
           <div class="d-flex gap-2">
             <button class="action-btn view" title="មើលបង្កាន់ដៃ"><i class="bi bi-receipt"></i></button>
+            <button class="action-btn delete" title="លុប" @click="confirmDelete(item)"><i class="bi bi-trash3"></i></button>
           </div>
         </template>
       </BaseTable>
@@ -176,6 +198,15 @@ onMounted(() => {
         <BaseButton variant="primary" @click="handleCreatePayment" :loading="billingStore.loading" fullWidth>រក្សាទុក</BaseButton>
       </template>
     </BaseModal>
+
+    <!-- Delete Confirmation Modal -->
+    <DeleteConfirmModal
+      :show="showDeleteModal"
+      :loading="billingStore.loading"
+      :message="`តើអ្នកពិតជាចង់លុបការទូទាត់ #${selectedPayment?.bill_id} នេះមែនទេ?`"
+      @close="showDeleteModal = false"
+      @confirm="handleDelete"
+    />
   </div>
 </template>
 
@@ -204,6 +235,12 @@ onMounted(() => {
   border-color: var(--primary);
 }
 
+.action-btn.delete:hover {
+  background: var(--danger-soft);
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
 .input-group-custom {
   position: relative;
   display: flex;
@@ -230,5 +267,14 @@ onMounted(() => {
   border-color: #0d9488;
   box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
   outline: none;
+}
+
+@media print {
+  .header-section button, 
+  .action-btn,
+  .sidebar,
+  .navbar {
+    display: none !important;
+  }
 }
 </style>

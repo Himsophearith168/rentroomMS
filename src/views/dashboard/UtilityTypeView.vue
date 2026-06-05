@@ -5,9 +5,14 @@
         <h1 class="display-6 fw-bold text-gradient">ប្រភេទសេវាកម្ម</h1>
         <p class="text-muted">គ្រប់គ្រងប្រភេទ និងតម្លៃសេវាកម្មប្រើប្រាស់ (ទឹក, ភ្លើង, ...)</p>
       </div>
-      <BaseButton variant="primary" @click="isCreateModalOpen = true">
-        <i class="bi bi-plus-lg me-2"></i>បន្ថែមប្រភេទសេវាកម្ម
-      </BaseButton>
+      <div class="d-flex gap-2">
+        <BaseButton variant="outline" @click="handlePrint">
+          <i class="bi bi-printer me-2"></i>បោះពុម្ព
+        </BaseButton>
+        <BaseButton variant="primary" @click="isCreateModalOpen = true">
+          <i class="bi bi-plus-lg me-2"></i>បន្ថែមប្រភេទសេវាកម្ម
+        </BaseButton>
+      </div>
     </div>
 
     <div class="card-modern overflow-hidden">
@@ -73,6 +78,15 @@
         <BaseButton variant="primary" @click="handleSubmit" :loading="utilityStore.loading" fullWidth>រក្សាទុក</BaseButton>
       </template>
     </BaseModal>
+
+    <!-- Delete Confirmation Modal -->
+    <DeleteConfirmModal
+      :show="showDeleteModal"
+      :loading="utilityStore.loading"
+      :message="`តើអ្នកពិតជាចង់លុបប្រភេទសេវាកម្ម '${selectedType?.utility_name}' នេះមែនទេ?`"
+      @close="showDeleteModal = false"
+      @confirm="handleDelete"
+    />
   </div>
 </template>
 
@@ -83,9 +97,12 @@ import BaseTable from '@/components/ui/BaseTable.vue';
 import BaseButton from '@/components/ui/BaseButton.vue';
 import BaseModal from '@/components/ui/BaseModal.vue';
 import BaseInput from '@/components/ui/BaseInput.vue';
+import DeleteConfirmModal from '@/components/ui/DeleteConfirmModal.vue';
 
 const utilityStore = useUtilityStore();
 const isCreateModalOpen = ref(false);
+const showDeleteModal = ref(false);
+const selectedType = ref(null);
 const isEditing = ref(false);
 const editingId = ref(null);
 
@@ -143,22 +160,24 @@ const handleSubmit = async () => {
   }
 };
 
-const confirmDelete = async (item) => {
-  const id = item.utility_type_id || item.id;
-  if (!id) {
-    console.error("Utility Type ID is missing", item);
-    utilityStore.error = 'មានបញ្ហាក្នុងការស្វែងរក ID ប្រភេទសេវាកម្ម';
-    return;
+const confirmDelete = (item) => {
+  selectedType.value = item;
+  showDeleteModal.value = true;
+};
+
+const handleDelete = async () => {
+  const id = selectedType.value.utility_type_id || selectedType.value.id;
+  try {
+    await utilityStore.deleteUtilityType(id);
+    showDeleteModal.value = false;
+  } catch (err) {
+    console.error("Failed to delete utility type:", err);
+    utilityStore.error = err?.response?.data?.message || 'មានបញ្ហាក្នុងការលុប';
   }
-  
-  if (confirm(`តើអ្នកពិតជាចង់លុបប្រភេទសេវាកម្ម "${item.utility_name}" មែនទេ?`)) {
-    try {
-      await utilityStore.deleteUtilityType(id);
-    } catch (err) {
-      console.error("Failed to delete utility type:", err);
-      utilityStore.error = err?.response?.data?.message || 'មានបញ្ហាក្នុងការលុប';
-    }
-  }
+};
+
+const handlePrint = () => {
+  window.print();
 };
 
 onMounted(() => {
@@ -223,5 +242,14 @@ onMounted(() => {
   border-color: #0d9488;
   box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
   outline: none;
+}
+
+@media print {
+  .header-section button, 
+  .action-btn,
+  .sidebar,
+  .navbar {
+    display: none !important;
+  }
 }
 </style>

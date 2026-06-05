@@ -1,108 +1,3 @@
-<script setup>
-import { onMounted, computed, ref } from 'vue';
-import { useBillingStore } from '@/stores/billing';
-import { useRentStore } from '@/stores/rentroom';
-import { useAuthStore } from '@/stores/authentication';
-import StateCard from '@/components/ui/StateCard.vue';
-import BaseTable from '@/components/ui/BaseTable.vue';
-import BaseButton from '@/components/ui/BaseButton.vue';
-import BaseModal from '@/components/ui/BaseModal.vue';
-import BaseInput from '@/components/ui/BaseInput.vue';
-
-const billingStore = useBillingStore();
-const rentStore = useRentStore();
-const authStore = useAuthStore();
-
-const isCreateModalOpen = ref(false);
-const formData = ref({
-  assignment_id: '',
-  bill_month: new Date().toISOString().split('T')[0].substring(0, 7),
-  other_fee: 0,
-  due_date: ''
-});
-
-const totalBillAmount = computed(() => {
-  return billingStore.bills.reduce((acc, bill) => acc + (parseFloat(bill.total_amount) || 0), 0).toLocaleString();
-});
-
-const unpaidCount = computed(() => {
-  return billingStore.bills.filter(bill => bill.status !== 'Paid').length;
-});
-
-const tableFields = [
-  { key: 'bill_id', label: 'លេខវិក្កយបត្រ', thClass: 'ps-4', tdClass: 'ps-4' },
-  { key: 'room_number', label: 'បន្ទប់' },
-  { key: 'fullname', label: 'អ្នកជួល' },
-  { key: 'bill_month', label: 'សម្រាប់ខែ' },
-  { key: 'total_amount', label: 'ទឹកប្រាក់សរុប' },
-  { key: 'status', label: 'ស្ថានភាព' },
-  { key: 'actions', label: 'សកម្មភាព' }
-];
-
-const getStatusBadge = (status) => {
-  switch (status) {
-    case 'Paid': return 'badge-success';
-    case 'Unpaid': return 'badge-danger';
-    case 'Partially Paid': return 'badge-warning';
-    case 'Draft': return 'badge-secondary';
-    default: return 'badge-info';
-  }
-};
-
-const getStatusText = (status) => {
-  switch (status) {
-    case 'Paid': return 'បង់រួច';
-    case 'Unpaid': return 'មិនទាន់បង់';
-    case 'Partially Paid': return 'បង់ខ្លះ';
-    case 'Draft': return 'ព្រាង';
-    default: return status;
-  }
-};
-
-const handleCreateBill = async () => {
-  try {
-    const assignment = rentStore.assignments.find(a => a.assignment_id == formData.value.assignment_id);
-    if (!assignment) {
-      throw new Error('សូមជ្រើសរើសការជួលដែលត្រឹមត្រូវ');
-    }
-    if (assignment.status === 'Ended') {
-      throw new Error('មិនអាចបង្កើតវិក្កយបត្រសម្រាប់ការជួលដែលបានបញ្ចប់');
-    }
-
-    const payload = {
-      assignment_id: Number(formData.value.assignment_id),
-      bill_month: `${formData.value.bill_month}-01`,
-      room_rent: Number(assignment.room_price) || 0,
-      other_fee: Number(formData.value.other_fee) || 0,
-      due_date: formData.value.due_date || null,
-      details: []
-    };
-
-    if (!payload.assignment_id || !payload.bill_month || payload.room_rent <= 0) {
-      throw new Error('assignment_id, bill_month, and room_rent are required');
-    }
-
-    await billingStore.createBill(payload);
-    isCreateModalOpen.value = false;
-  } catch (err) {
-    console.error("Failed to create bill:", err);
-    const message = err.response?.data?.message || err.message || 'Failed to create bill';
-    billingStore.error = message;
-    alert(message);
-  }
-};
-
-onMounted(() => {
-  // Only fetch if user is authenticated
-  if (authStore.isAuthenticated && authStore.token) {
-    billingStore.fetchBills();
-    rentStore.fetchAssignments();
-  } else {
-    billingStore.error = 'សូមចូលប្រើប្រាស់ដំបូង';
-  }
-});
-</script>
-
 <template>
   <div class="bills-view animate-entrance">
     <!-- Error Alert -->
@@ -183,7 +78,12 @@ onMounted(() => {
             <button class="action-btn view" title="មើលលម្អិត" @click="$router.push({ name: 'BillDetail', query: { bill_id: item.bill_id } })">
               <i class="bi bi-eye"></i>
             </button>
-            <button class="action-btn print" title="បោះពុម្ព"><i class="bi bi-printer"></i></button>
+            <button class="action-btn print" title="បោះពុម្ព" @click="handlePrintBill(item)">
+              <i class="bi bi-printer"></i>
+            </button>
+            <button class="action-btn delete" title="លុប" @click="confirmDelete(item)">
+              <i class="bi bi-trash3"></i>
+            </button>
           </div>
         </template>
       </BaseTable>
@@ -220,8 +120,144 @@ onMounted(() => {
         <BaseButton variant="primary" @click="handleCreateBill" :loading="billingStore.loading" fullWidth>បង្កើតវិក្កយបត្រ</BaseButton>
       </template>
     </BaseModal>
+
+    <!-- Delete Confirmation Modal -->
+    <DeleteConfirmModal
+      :show="showDeleteModal"
+      :loading="billingStore.loading"
+      :message="`តើអ្នកពិតជាចង់លុបវិក្កយបត្រ #${selectedBill?.bill_id} នេះមែនទេ?`"
+      @close="showDeleteModal = false"
+      @confirm="handleDelete"
+    />
   </div>
 </template>
+
+<script setup>
+import { onMounted, computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useBillingStore } from '@/stores/billing';
+import { useRentStore } from '@/stores/rentroom';
+import { useAuthStore } from '@/stores/authentication';
+import StateCard from '@/components/ui/StateCard.vue';
+import BaseTable from '@/components/ui/BaseTable.vue';
+import BaseButton from '@/components/ui/BaseButton.vue';
+import BaseModal from '@/components/ui/BaseModal.vue';
+import BaseInput from '@/components/ui/BaseInput.vue';
+import DeleteConfirmModal from '@/components/ui/DeleteConfirmModal.vue';
+
+const billingStore = useBillingStore();
+const rentStore = useRentStore();
+const authStore = useAuthStore();
+const router = useRouter();
+
+const isCreateModalOpen = ref(false);
+const showDeleteModal = ref(false);
+const selectedBill = ref(null);
+const formData = ref({
+  assignment_id: '',
+  bill_month: new Date().toISOString().split('T')[0].substring(0, 7),
+  other_fee: 0,
+  due_date: ''
+});
+
+const totalBillAmount = computed(() => {
+  return billingStore.bills.reduce((acc, bill) => acc + (parseFloat(bill.total_amount) || 0), 0).toLocaleString();
+});
+
+const unpaidCount = computed(() => {
+  return billingStore.bills.filter(bill => bill.status !== 'Paid').length;
+});
+
+const tableFields = [
+  { key: 'bill_id', label: 'លេខវិក្កយបត្រ', thClass: 'ps-4', tdClass: 'ps-4' },
+  { key: 'room_number', label: 'បន្ទប់' },
+  { key: 'fullname', label: 'អ្នកជួល' },
+  { key: 'bill_month', label: 'សម្រាប់ខែ' },
+  { key: 'total_amount', label: 'ទឹកប្រាក់សរុប' },
+  { key: 'status', label: 'ស្ថានភាព' },
+  { key: 'actions', label: 'សកម្មភាព' }
+];
+
+const getStatusBadge = (status) => {
+  switch (status) {
+    case 'Paid': return 'badge-success';
+    case 'Unpaid': return 'badge-danger';
+    case 'Partially Paid': return 'badge-warning';
+    case 'Draft': return 'badge-secondary';
+    default: return 'badge-info';
+  }
+};
+
+const getStatusText = (status) => {
+  switch (status) {
+    case 'Paid': return 'បង់រួច';
+    case 'Unpaid': return 'មិនទាន់បង់';
+    case 'Partially Paid': return 'បង់ខ្លះ';
+    case 'Draft': return 'ព្រាង';
+    default: return status;
+  }
+};
+
+const handleCreateBill = async () => {
+  try {
+    const assignment = rentStore.assignments.find(a => a.assignment_id == formData.value.assignment_id);
+    if (!assignment) {
+      throw new Error('សូមជ្រើសរើសការជួលដែលត្រឹមត្រូវ');
+    }
+    if (assignment.status === 'Ended') {
+      throw new Error('មិនអាចបង្កើតវិក្កយបត្រសម្រាប់ការជួលដែលបានបញ្ចប់');
+    }
+
+    const payload = {
+      assignment_id: Number(formData.value.assignment_id),
+      bill_month: `${formData.value.bill_month}-01`,
+      room_rent: Number(assignment.room_price) || 0,
+      other_fee: Number(formData.value.other_fee) || 0,
+      due_date: formData.value.due_date || null,
+      details: []
+    };
+
+    if (!payload.assignment_id || !payload.bill_month || payload.room_rent <= 0) {
+      throw new Error('assignment_id, bill_month, and room_rent are required');
+    }
+
+    await billingStore.createBill(payload);
+    isCreateModalOpen.value = false;
+  } catch (err) {
+    console.error("Failed to create bill:", err);
+    const message = err.response?.data?.message || err.message || 'Failed to create bill';
+    billingStore.error = message;
+    alert(message);
+  }
+};
+
+const confirmDelete = (bill) => {
+  selectedBill.value = bill;
+  showDeleteModal.value = true;
+};
+
+const handleDelete = async () => {
+  try {
+    await billingStore.deleteBill(selectedBill.value.bill_id);
+    showDeleteModal.value = false;
+  } catch (err) {
+    alert('បរាជ័យក្នុងការលុប');
+  }
+};
+
+const handlePrintBill = (bill) => {
+  router.push({ name: 'BillDetail', query: { bill_id: bill.bill_id, print: 'true' } });
+};
+
+onMounted(() => {
+  if (authStore.isAuthenticated && authStore.token) {
+    billingStore.fetchBills();
+    rentStore.fetchAssignments();
+  } else {
+    billingStore.error = 'សូមចូលប្រើប្រាស់ដំបូង';
+  }
+});
+</script>
 
 <style scoped>
 .bills-view {
@@ -249,9 +285,15 @@ onMounted(() => {
 }
 
 .action-btn.print:hover {
-  background: var(--surface-alt);
-  color: var(--text-main);
-  border-color: var(--text-muted);
+  background: var(--primary-soft);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.action-btn.delete:hover {
+  background: var(--danger-soft);
+  color: var(--danger);
+  border-color: var(--danger);
 }
 
 .input-group-custom {
@@ -280,5 +322,15 @@ onMounted(() => {
   border-color: #0d9488;
   box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
   outline: none;
+}
+
+@media print {
+  .header-section button,
+  .action-btn,
+  .sidebar,
+  .navbar,
+  .alert {
+    display: none !important;
+  }
 }
 </style>

@@ -128,6 +128,12 @@
         <template #cell(room_number)="{ item }">
           <span class="fw-semibold text-dark">#{{ item.room_number }}</span>
         </template>
+        <template #cell(tenant)="{ item }">
+          <span v-if="item.status === 'Available' || item.status === 'ទំនេរ'" class="text-muted">---</span>
+          <span v-else class="text-dark">
+            {{ getTenantName(item.id) }}
+          </span>
+        </template>
       </BaseTable>
     </div>
   </div>
@@ -154,9 +160,18 @@ const tableFields = [
   { key: 'tenant', label: 'អ្នកជួល' }
 ];
 
+const getTenantName = (roomId) => {
+  const assignment = rentStore.assignments.find(a => a.room_id === roomId && a.status === 'Active');
+  if (assignment) {
+    return assignment.tenant?.name || assignment.tenant_name || 'មិនស្គាល់';
+  }
+  return 'មានអ្នកជួល';
+};
+
 onMounted(() => {
   rentStore.fetchRooms();
   rentStore.fetchTenants();
+  rentStore.fetchAssignments();
 });
 </script>
 

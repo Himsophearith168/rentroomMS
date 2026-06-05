@@ -5,9 +5,14 @@
         <h1 class="display-6 fw-bold text-gradient">តម្លៃសេវាកម្ម</h1>
         <p class="text-muted">កំណត់តម្លៃសម្រាប់ប្រភេទសេវាកម្មនីមួយៗ</p>
       </div>
-      <BaseButton variant="primary" @click="isCreateModalOpen = true">
-        <i class="bi bi-plus-lg me-2"></i>បន្ថែមតម្លៃសេវាកម្ម
-      </BaseButton>
+      <div class="d-flex gap-2">
+        <BaseButton variant="outline" @click="handlePrint">
+          <i class="bi bi-printer me-2"></i>បោះពុម្ព
+        </BaseButton>
+        <BaseButton variant="primary" @click="isCreateModalOpen = true">
+          <i class="bi bi-plus-lg me-2"></i>បន្ថែមតម្លៃសេវាកម្ម
+        </BaseButton>
+      </div>
     </div>
 
     <div class="card-modern overflow-hidden">
@@ -103,6 +108,15 @@
         <BaseButton variant="primary" @click="handleSubmit" :loading="utilityStore.loading" fullWidth>រក្សាទុក</BaseButton>
       </template>
     </BaseModal>
+
+    <!-- Delete Confirmation Modal -->
+    <DeleteConfirmModal
+      :show="showDeleteModal"
+      :loading="utilityStore.loading"
+      :message="`តើអ្នកពិតជាចង់លុបតម្លៃសេវាកម្ម '${selectedRate?.utility_name}' នេះមែនទេ?`"
+      @close="showDeleteModal = false"
+      @confirm="handleDelete"
+    />
   </div>
 </template>
 
@@ -113,9 +127,12 @@ import BaseTable from '@/components/ui/BaseTable.vue';
 import BaseButton from '@/components/ui/BaseButton.vue';
 import BaseModal from '@/components/ui/BaseModal.vue';
 import BaseInput from '@/components/ui/BaseInput.vue';
+import DeleteConfirmModal from '@/components/ui/DeleteConfirmModal.vue';
 
 const utilityStore = useUtilityStore();
 const isCreateModalOpen = ref(false);
+const showDeleteModal = ref(false);
+const selectedRate = ref(null);
 const isEditing = ref(false);
 const editingId = ref(null);
 const submitError = ref(null); // FIX: track error message to display in modal
@@ -199,25 +216,28 @@ const handleSubmit = async () => {
   }
 };
 
-const confirmDelete = async (item) => {
-  const id = item.rate_id || item.id;
-  if (!id) {
-    console.error('Utility Rate ID is missing', item);
-    return;
+const confirmDelete = (item) => {
+  selectedRate.value = item;
+  showDeleteModal.value = true;
+};
+
+const handleDelete = async () => {
+  const id = selectedRate.value.rate_id || selectedRate.value.id;
+  try {
+    await utilityStore.deleteUtilityRate(id);
+    showDeleteModal.value = false;
+  } catch (err) {
+    const serverMsg =
+      err?.response?.data?.message ||
+      err?.response?.data?.error ||
+      err?.message ||
+      'មានបញ្ហាក្នុងការលុប';
+    alert(serverMsg);
   }
-  if (confirm('តើអ្នកពិតជាចង់លុបតម្លៃសេវាកម្មនេះមែនទេ?')) {
-    try {
-      await utilityStore.deleteUtilityRate(id);
-    } catch (err) {
-      const serverMsg =
-        err?.response?.data?.message ||
-        err?.response?.data?.error ||
-        err?.message ||
-        'មានបញ្ហាក្នុងការលុប';
-      alert(serverMsg);
-      console.error('Failed to delete utility rate:', err);
-    }
-  }
+};
+
+const handlePrint = () => {
+  window.print();
 };
 
 onMounted(() => {
@@ -283,5 +303,14 @@ onMounted(() => {
   border-color: #0d9488;
   box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
   outline: none;
+}
+
+@media print {
+  .header-section button, 
+  .action-btn,
+  .sidebar,
+  .navbar {
+    display: none !important;
+  }
 }
 </style>

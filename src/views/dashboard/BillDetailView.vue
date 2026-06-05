@@ -5,12 +5,17 @@
         <h1 class="display-6 fw-bold text-gradient">លម្អិតវិក្កយបត្រ</h1>
         <p class="text-muted">ពិនិត្យមើលធាតុនីមួយៗនៃវិក្កយបត្រ #{{ billId }}</p>
       </div>
-      <BaseButton variant="outline" @click="$router.push({ name: 'Bill' })">
-        <i class="bi bi-arrow-left me-2"></i>ត្រឡប់ទៅបញ្ជីវិក្កយបត្រ
-      </BaseButton>
+      <div class="d-flex gap-2">
+        <BaseButton variant="outline" @click="handlePrint">
+          <i class="bi bi-printer me-2"></i>បោះពុម្ព
+        </BaseButton>
+        <BaseButton variant="secondary" @click="$router.push({ name: 'Bill' })">
+          <i class="bi bi-arrow-left me-2"></i>ត្រឡប់ក្រោយ
+        </BaseButton>
+      </div>
     </div>
 
-    <div v-if="selectedBill" class="row g-4 mb-5">
+    <div v-if="selectedBill" class="row g-4 mb-5 print-section">
       <div class="col-md-4">
         <div class="card-modern p-4 h-100">
           <h5 class="fw-bold mb-3 border-bottom pb-2">ព័ត៌មានវិក្កយបត្រ</h5>
@@ -55,7 +60,7 @@
       </div>
     </div>
 
-    <div class="card-modern overflow-hidden">
+    <div class="card-modern overflow-hidden print-table">
       <BaseTable 
         :items="billingStore.billDetails" 
         :fields="tableFields"
@@ -81,11 +86,25 @@
         </template>
       </BaseTable>
     </div>
+    
+    <div class="print-only mt-5 text-center">
+      <p class="text-muted small">អរគុណសម្រាប់ការស្នាក់នៅជាមួយយើងខ្ញុំ!</p>
+      <div class="d-flex justify-content-between mt-5 pt-5">
+        <div class="text-center" style="width: 200px;">
+          <p class="mb-5">ហត្ថលេខាម្ចាស់ផ្ទះ</p>
+          <div class="border-top pt-2">................................</div>
+        </div>
+        <div class="text-center" style="width: 200px;">
+          <p class="mb-5">ហត្ថលេខាអ្នកជួល</p>
+          <div class="border-top pt-2">................................</div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue';
+import { onMounted, computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useBillingStore } from '@/stores/billing';
 import BaseTable from '@/components/ui/BaseTable.vue';
@@ -94,6 +113,7 @@ import BaseButton from '@/components/ui/BaseButton.vue';
 const route = useRoute();
 const billingStore = useBillingStore();
 const billId = computed(() => route.query.bill_id);
+const shouldPrint = computed(() => route.query.print === 'true');
 
 const selectedBill = computed(() => {
   return billingStore.bills.find(b => b.bill_id == billId.value);
@@ -131,6 +151,10 @@ const getStatusText = (status) => {
   }
 };
 
+const handlePrint = () => {
+  window.print();
+};
+
 onMounted(() => {
   if (billId.value) {
     billingStore.fetchBillDetails(billId.value);
@@ -139,6 +163,14 @@ onMounted(() => {
     }
   }
 });
+
+watch([() => billingStore.loading, shouldPrint], ([loading, print]) => {
+  if (!loading && print) {
+    setTimeout(() => {
+      window.print();
+    }, 500);
+  }
+}, { immediate: true });
 </script>
 
 <style scoped>
@@ -161,5 +193,48 @@ onMounted(() => {
 .info-row .value {
   color: var(--text-main);
   font-weight: 500;
+}
+
+.print-only {
+  display: none;
+}
+
+@media print {
+  .header-section,
+  .sidebar,
+  .navbar {
+    display: none !important;
+  }
+  
+  .bill-detail-view {
+    padding: 0;
+    max-width: 100%;
+  }
+  
+  .card-modern {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+  
+  .row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 20px;
+  }
+  
+  .col-md-4 {
+    flex: 1;
+  }
+  
+  .print-only {
+    display: block;
+  }
+  
+  .badge-soft {
+    border: 1px solid #ddd;
+    background: none !important;
+    color: #000 !important;
+  }
 }
 </style>
